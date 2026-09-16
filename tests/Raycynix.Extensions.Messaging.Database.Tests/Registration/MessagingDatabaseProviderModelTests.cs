@@ -19,6 +19,31 @@ namespace Raycynix.Extensions.Messaging.Database.Tests.Registration;
 /// </summary>
 public sealed class MessagingDatabaseProviderModelTests
 {
+    [Theory]
+    [InlineData(false, null)]
+    [InlineData(false, "messaging")]
+    [InlineData(true, null)]
+    [InlineData(true, "messaging")]
+    public void InboxAndOutbox_ShouldInheritProviderDefaultSchema(bool sqlServer, string? schema)
+    {
+        using var provider = BuildProvider(
+            sqlServer ? "Server=localhost;Database=messaging;Trusted_Connection=true" : "Host=localhost;Database=messaging",
+            builder => sqlServer
+                ? builder.AddMsSql(options => options.DefaultSchema = schema)
+                : builder.AddPostgreSql(options => options.DefaultSchema = schema));
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<RaycynixDatabaseContext>();
+
+        foreach (var type in new[] { typeof(MessagingInboxEntryEntity), typeof(MessagingOutboxEntryEntity) })
+        {
+            var entity = context.Model.FindEntityType(type)!;
+            entity.GetSchema().Should().Be(schema);
+            var table = sqlServer ? $"[{entity.GetTableName()}]" : entity.GetTableName();
+            var qualifiedTable = schema is null ? table : sqlServer ? $"[{schema}].{table}" : $"{schema}.{table}";
+            context.Database.GenerateCreateScript().Should().Contain($"CREATE TABLE {qualifiedTable}");
+        }
+    }
+
     /// <summary>
     /// Verifies that the SQLite provider builds the messaging model with concurrency tokens required for optimistic leases.
     /// </summary>
