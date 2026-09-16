@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 adds validated and read-only mapper contracts, defensive exception data snapshots, composite-name secret masking, bounded retry backoff, safe override-friendly DI registration, retry context cleanup, and stricter operation argument validation.</PackageReleaseNotes>
 
         <Description>Core validated exception mapping, sensitive-data masking, transient retry execution, and background task failure handling for Raycynix applications.</Description>
         <PackageTags>raycynix;exceptions;error-handling;retry;mapping;masking;background;validation;dependency-injection;dotnet;net10</PackageTags>

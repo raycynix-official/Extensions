@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>Introduces SmtpOptions under EmailOptions:SmtpOptions, streamed attachment composition with deterministic stream disposal, stricter transport and credential validation, and the hardened Email 3.0 message contracts.</PackageReleaseNotes>
 
         <Description>MailKit-based SMTP provider for Raycynix email with typed transport options, credential and TLS validation, MIME composition, attachments, and asynchronous delivery.</Description>
         <PackageTags>raycynix;email;smtp;mailkit;mail;sender;provider;options;tls;dotnet</PackageTags>

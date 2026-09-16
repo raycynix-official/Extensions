@@ -1,11 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-
-        <PackageReleaseNotes>v3.0.0 replaces MySqlConfiguration with MySqlOptions, binds from DatabaseOptions:MySqlOptions, and validates command timeout during options resolution.</PackageReleaseNotes>
 
         <Description>MySQL EF Core integration with typed MySqlOptions, validated timeouts, connection-string composition, pooling, retries, and migrations.</Description>
         <PackageTags>raycynix;database;mysql;provider;options;configuration;provider-validation;efcore;entityframework;migrations;connection-string;pooling;dotnet;net10</PackageTags>

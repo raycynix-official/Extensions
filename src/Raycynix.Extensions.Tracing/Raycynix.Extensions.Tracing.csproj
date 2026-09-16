@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 removes the custom ITracer implementation and registers the shared standard System.Diagnostics.ActivitySource used by Raycynix instrumentation.</PackageReleaseNotes>
 
         <Description>Standard System.Diagnostics.ActivitySource registration for provider-neutral Raycynix distributed tracing and OpenTelemetry instrumentation.</Description>
         <PackageTags>raycynix;tracing;activitysource;system-diagnostics;opentelemetry;aspire;distributed-tracing;instrumentation;dotnet;net10</PackageTags>

@@ -1,11 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-
-        <PackageReleaseNotes>v3.0.0 replaces PostgreSqlConfiguration with PostgreSqlOptions, binds from DatabaseOptions:PostgreSqlOptions, and validates pool ranges and command timeout during options resolution.</PackageReleaseNotes>
 
         <Description>PostgreSQL EF Core integration with typed PostgreSqlOptions, validated pooling, Npgsql connection-string composition, retries, and migrations.</Description>
         <PackageTags>raycynix;database;postgresql;npgsql;provider;options;configuration;provider-validation;efcore;entityframework;migrations;connection-string;pooling;dotnet;net10</PackageTags>

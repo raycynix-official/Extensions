@@ -1,13 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
 
         <Description>Contracts for Raycynix typed options access, named options, diagnostics, redaction, feature flags, validation, reload governance, change handling, and application environment awareness.</Description>
         <PackageTags>raycynix;configuration;abstractions;options;typed-options;named-options;accessor;feature-flags;validation;reload;diagnostics;redaction;environment;contracts;dotnet;net10</PackageTags>
-        <PackageReleaseNotes>v3.0.0 aligns the abstractions package with net10.0/Microsoft.Extensions 10 and documents the current typed options, diagnostics, redaction, feature flag, validation, reload, and change-handler contracts.</PackageReleaseNotes>
 
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>

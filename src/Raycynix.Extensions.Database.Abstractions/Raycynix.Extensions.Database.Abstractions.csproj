@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 renames database configuration contracts to DatabaseOptions and ConnectionOptions, moves them to the Options namespace, and makes connection settings mutable from setup callbacks.</PackageReleaseNotes>
 
         <Description>Database contracts and typed options for Raycynix EF Core providers, configurators, initialization, model assembly registration, and observability.</Description>
         <PackageTags>raycynix;database;abstractions;contracts;options;efcore;configurators;providers;provider-validation;configuration;observability;initialization;dotnet;net10</PackageTags>

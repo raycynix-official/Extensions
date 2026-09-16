@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
 
         <Description>Transport-safe shared API contracts for .NET, including semantic contract versions, evolution metadata, paging, money and quantity models, validation errors, and versioned envelopes.</Description>
         <PackageTags>raycynix;contracts;dto;semantic-versioning;contract-versioning;contract-metadata;api;errors;paging;validation;serialization;dotnet;net10</PackageTags>
-        <PackageReleaseNotes>v3.0.0 aligns the package with net10.0, hardens contract models against malformed deserialized null values, prevents mutation of the shared initial version, validates contract evolution attribute versions, and enforces consistent paging navigation metadata.</PackageReleaseNotes>
 
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>

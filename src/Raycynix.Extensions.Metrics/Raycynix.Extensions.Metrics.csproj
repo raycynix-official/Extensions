@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 replaces the custom Prometheus-bound metrics service with standard System.Diagnostics.Metrics and IMeterFactory registration, removes ineffective endpoint and health-check options, and makes exporters an explicit host integration concern.</PackageReleaseNotes>
 
         <Description>Standard System.Diagnostics.Metrics and IMeterFactory registration for provider-neutral Raycynix application instrumentation.</Description>
         <PackageTags>raycynix;metrics;system-diagnostics-metrics;imeterfactory;instrumentation;opentelemetry;aspire;telemetry;dotnet;net10</PackageTags>

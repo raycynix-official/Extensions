@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 composes the standard IMeterFactory-based Metrics 3.0 pipeline, the shared ActivitySource-based Tracing 3.0 pipeline, and operation context registration.</PackageReleaseNotes>
 
         <Description>Provider-neutral observability composition for Raycynix applications, combining standard .NET metrics, tracing, and ambient operation context registration.</Description>
         <PackageTags>raycynix;observability;metrics;system-diagnostics-metrics;imeterfactory;tracing;correlation;operation-context;opentelemetry;dotnet;net10</PackageTags>

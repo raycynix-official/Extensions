@@ -1,11 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-
-        <PackageReleaseNotes>v3.0.0 replaces SqliteConfiguration with SqliteOptions, binds from DatabaseOptions:SqliteOptions, and validates mode, cache, and command timeout during options resolution.</PackageReleaseNotes>
 
         <Description>SQLite EF Core integration with typed SqliteOptions, validated mode and cache settings, connection-string composition, and migrations.</Description>
         <PackageTags>raycynix;database;sqlite;provider;options;configuration;provider-validation;efcore;entityframework;migrations;connection-string;embedded-database;dotnet;net10</PackageTags>

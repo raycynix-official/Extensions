@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>Makes inbound retry and dead-letter handling cancellation-aware and replaces exception messages in transport headers with safe exception type identifiers.</PackageReleaseNotes>
 
         <Description>RabbitMQ transport integration for Raycynix messaging with topology bootstrap, inbound consumer hosting, retry/dead-letter handling, and configuration-based setup.</Description>
         <PackageTags>raycynix;messaging;rabbitmq;amqp;events;consumer;topology;retry;dead-letter;configuration;dotnet</PackageTags>

@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
         <IsPackable>true</IsPackable>
 
         <Title>Raycynix Serilog Aspire AppHost Integration</Title>
         <Description>Aspire 13 AppHost integration for Raycynix Serilog, adding one-line structured logging registration to IDistributedApplicationBuilder while keeping resource-process logging explicit.</Description>
         <PackageTags>raycynix;serilog;logging;structured-logging;aspire;apphost;distributed-application;orchestration;idistributedapplicationbuilder;dotnet;net10</PackageTags>
-        <PackageReleaseNotes>v3.0.0 adds AddRaycynixSerilog for Aspire IDistributedApplicationBuilder, configures the AppHost process through the shared Raycynix Serilog pipeline, supports the core configuration callback and optional sink integrations, and documents the separate logging lifecycle of orchestrated resources.</PackageReleaseNotes>
 
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>

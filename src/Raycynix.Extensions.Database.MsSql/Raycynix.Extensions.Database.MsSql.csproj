@@ -1,11 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-
-        <PackageReleaseNotes>v3.0.0 replaces MsSqlServerConfiguration with MsSqlServerOptions, binds from DatabaseOptions:MsSqlServerOptions, and validates command timeout during options resolution.</PackageReleaseNotes>
 
         <Description>SQL Server EF Core integration with typed MsSqlServerOptions, validated timeouts, connection-string composition, retries, and migrations.</Description>
         <PackageTags>raycynix;database;sqlserver;mssql;provider;options;configuration;provider-validation;efcore;entityframework;migrations;connection-string;dotnet;net10</PackageTags>

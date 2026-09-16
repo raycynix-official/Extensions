@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 replaces custom request middleware with stable OpenTelemetry ASP.NET Core instrumentation and standard Microsoft.Extensions.Logging activity tracking scopes.</PackageReleaseNotes>
 
         <Description>Stable OpenTelemetry ASP.NET Core tracing instrumentation for the shared Raycynix ActivitySource, OTLP exporters, Aspire, and logging correlation.</Description>
         <PackageTags>raycynix;tracing;aspnetcore;opentelemetry;otlp;aspire;http;correlation;activitysource;instrumentation;dotnet;net10</PackageTags>

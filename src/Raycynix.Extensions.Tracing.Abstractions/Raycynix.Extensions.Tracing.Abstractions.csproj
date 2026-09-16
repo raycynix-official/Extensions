@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 removes ITracer in favor of the standard ActivitySource API and exposes the stable shared Raycynix source name, version, and instance.</PackageReleaseNotes>
 
         <Description>Shared ActivitySource identity and standard System.Diagnostics tracing primitives for provider-neutral Raycynix instrumentation.</Description>
         <PackageTags>raycynix;tracing;abstractions;activitysource;system-diagnostics;opentelemetry;aspire;instrumentation;dotnet;net10</PackageTags>

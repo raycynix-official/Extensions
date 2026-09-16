@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 migrates optional messaging instrumentation from the removed custom metrics interfaces to standard System.Diagnostics.Metrics counters and histograms with named tags and explicit units.</PackageReleaseNotes>
 
         <Description>Transport-agnostic messaging, dispatch, direct requests, standard .NET metrics instrumentation, scoped envelopes, and outbox/inbox reliability foundations.</Description>
         <PackageTags>raycynix;messaging;json;grpc;events;integration;outbox;inbox;reliability;observability;metrics;opentelemetry;dotnet;net10</PackageTags>

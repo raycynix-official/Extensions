@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 hardens exception contracts with validated required values and status codes, defensive detail snapshots, bounded retry options, and a safer public exception response contract that excludes internal execution context and query strings.</PackageReleaseNotes>
 
         <Description>Validated abstractions and contracts for Raycynix exception handling, public error responses, retry execution, masking, and background failure flows.</Description>
         <PackageTags>raycynix;exceptions;abstractions;contracts;error-handling;error-response;retry;masking;background;validation;dotnet;net10</PackageTags>

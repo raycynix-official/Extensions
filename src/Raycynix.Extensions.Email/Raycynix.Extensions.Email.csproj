@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>Introduces EmailOptions with the shared options type-name section convention and stricter validation for default sender and reply-to settings.</PackageReleaseNotes>
 
         <Description>Email provider registration infrastructure with typed Email options, default sender and reply-to resolution, provider selection, validation, and dependency injection support.</Description>
         <PackageTags>raycynix;email;mail;sender;options;configuration;provider;dependency-injection;dotnet</PackageTags>

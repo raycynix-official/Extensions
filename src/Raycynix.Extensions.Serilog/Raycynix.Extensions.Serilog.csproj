@@ -1,14 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
         <IsPackable>true</IsPackable>
 
-        <Title>Raycynix Serilog Hosting</Title>
-        <Description>Serilog hosting integration for .NET 10 applications using Microsoft.Extensions.Logging, with native configuration, service metadata enrichment, fallback console output, dependency-injected components, and ordered extension points.</Description>
 
+        <Description>Serilog hosting integration for .NET 10 applications using Microsoft.Extensions.Logging, with native configuration, service metadata enrichment, fallback console output, dependency-injected components, and ordered extension points.</Description>
         <PackageTags>raycynix;serilog;logging;microsoft-extensions-logging;structured-logging;generic-host;aspnetcore;dependency-injection;configuration;console;enrichment;message-templates;dotnet;net10</PackageTags>
-        <PackageReleaseNotes>v3.0.0 replaces the custom Raycynix logger abstraction with standard Microsoft.Extensions.Logging, adds AddRaycynixSerilog for modern hosts and UseRaycynixSerilog for classic hosts, binds RaycynixSerilogOptions from Raycynix:Serilog, reads native Serilog configuration and DI components, enriches service metadata, provides true fallback console detection, and introduces ordered logger and sink configurators.</PackageReleaseNotes>
 
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
@@ -19,11 +16,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12"/>
         <PackageReference Include="Serilog" Version="4.4.0"/>
         <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0"/>
         <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1"/>

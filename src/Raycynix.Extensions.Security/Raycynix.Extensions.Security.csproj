@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 renames security configuration models to SecurityOptions and JwtOptions, binds from SecurityOptions:JwtOptions, exposes the bound JwtOptions snapshot directly through DI, and validates JWT authority URIs.</PackageReleaseNotes>
 
         <Description>Core security services with typed SecurityOptions and JwtOptions, shared identity contexts, validated JWT settings, and DI-ready configuration snapshots.</Description>
         <PackageTags>raycynix;security;authorization;identity;claims;jwt;options;configuration;binding;rbac;dependency-injection;dotnet;net10</PackageTags>

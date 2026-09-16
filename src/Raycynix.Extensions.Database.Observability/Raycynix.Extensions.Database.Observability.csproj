@@ -1,11 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-
-        <PackageReleaseNotes>v3.0.0 migrates database tracing to the shared standard ActivitySource with client span kinds and status codes, and migrates metrics to System.Diagnostics.Metrics with named tags and explicit units.</PackageReleaseNotes>
 
         <Description>Database observability integration for recording initialization, creation, migration, and model-building through tracing and standard .NET metrics.</Description>
         <PackageTags>raycynix;database;observability;metrics;system-diagnostics-metrics;opentelemetry;tracing;efcore;entityframework;initialization;migrations;dotnet;net10</PackageTags>
