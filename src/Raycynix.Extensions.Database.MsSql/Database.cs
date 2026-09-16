@@ -37,6 +37,8 @@ public static class Database
 
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IDatabaseProviderRegistration, MsSqlServerDatabaseProviderRegistration>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IDatabaseProviderModelConfigurator, MsSqlServerProviderModelConfigurator>());
 
         return builder;
     }
