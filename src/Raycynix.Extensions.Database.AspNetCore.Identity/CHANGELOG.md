@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1
+
+### Added
+
+- Verified default-schema inheritance for all Identity tables with PostgreSQL and SQL Server, including registration without schema configuration.
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
 ## 3.0.0
 ### Changed
 - Updated default, generic, and custom Identity contexts to use `DatabaseOptions`.

@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
+### Fixed
+
+- Aligned the Prometheus exporter used by tests and the example with OpenTelemetry SDK 1.18.0, fixing metrics endpoint HTTP 500 failures.
+
 ## 3.0.0
 ### Changed
 - Incoming correlation identifiers are now single-value, length-bounded, and restricted to a safe ASCII character set before logging or propagation.

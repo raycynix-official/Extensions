@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.1
+
+### Added
+
+- Added `IDatabaseProviderModelConfigurator` for provider model defaults and their cache identity.
+- Added `DatabaseSchemaAttribute` for declaring a configurator's table schema.
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
 ## 3.0.0
 ### Changed
 - Renamed `DatabaseConfiguration` to `DatabaseOptions`.

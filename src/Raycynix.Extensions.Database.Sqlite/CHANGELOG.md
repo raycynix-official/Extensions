@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1
+
+### Added
+
+- Documented and tested omission of explicit schema names from SQLite queries and table-creation SQL.
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
 ## 3.0.0
 ### Changed
 - Renamed `SqliteConfiguration` to `SqliteOptions` and moved it to the `Options` namespace.

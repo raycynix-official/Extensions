@@ -1,4 +1,31 @@
-# Changelogs
+# Changelog
+
+All published packages share version **3.0.1**, defined in [Directory.Build.props](Directory.Build.props).
+
+## 3.0.1
+
+### Added
+
+- `DatabaseSchemaAttribute` on entity configurators and `EntitySchema(...)` for fluent schema mapping, overrides, and resetting to the default.
+- Optional `PostgreSqlOptions.DefaultSchema`, configured through registration or `DatabaseOptions:PostgreSqlOptions:DefaultSchema`.
+- Optional `MsSqlServerOptions.DefaultSchema` with the same mapping precedence, validation, and model-cache isolation as PostgreSQL.
+- Schema inheritance tests for Identity and messaging Inbox/Outbox with PostgreSQL and SQL Server; SQL generation tests documenting MySQL database qualification and SQLite schema omission.
+- Provider model defaults via `IDatabaseProviderModelConfigurator`, applied before entity configurators and included in EF Core model cache keys.
+- Regression coverage for schema precedence, generated PostgreSQL queries and DDL, runtime/design-time cache isolation, and registration without any schema settings.
+
+### Changed
+
+- Centralized all published package versions in `Directory.Build.props`; removed duplicate declarations from package projects.
+- Centralized NuGet release notes with the shared version and links to release history.
+- Updated dependencies, including OpenTelemetry SDK 1.18.0 and the compatible Prometheus exporter 1.18.0-beta.1 in tests and examples.
+- `EntityName(...)` preserves an explicitly configured schema. Without schema configuration, database/provider defaults remain in effect; PostgreSQL uses normal `search_path` resolution. Migration history is not relocated.
+
+### Fixed
+
+- Fixed Prometheus endpoint HTTP 500 failures in tests caused by exporter/SDK version mismatch.
+- Replaced fixed delays in RabbitMQ retry and dead-letter tests with acknowledgement completion signals.
+
+## Package changelogs
 
 Per-package changelogs live next to each package under `src/<PackageName>/CHANGELOG.md`.
 

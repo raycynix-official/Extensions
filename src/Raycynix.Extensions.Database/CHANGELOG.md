@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.0.1
+
+### Added
+
+- Apply provider model defaults before entity configurators and include their settings in model cache keys.
+- Apply `DatabaseSchemaAttribute` in entity configurators and expose `EntitySchema(...)` for fluent schema overrides or resetting to the default.
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+- Preserve explicit table schemas when using `EntityName(...)`.
+
 ## 3.0.0
 ### Changed
 - Adopted `DatabaseOptions` and the `DatabaseOptions` configuration section.
