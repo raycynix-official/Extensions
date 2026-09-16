@@ -1,6 +1,8 @@
 # Raycynix.Extensions.Metrics.Abstractions
 
-Version `3.0.0` contains shared conventions and helpers for provider-neutral Raycynix metrics.
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+This package contains shared conventions and helpers for provider-neutral Raycynix metrics.
 
 ## API
 

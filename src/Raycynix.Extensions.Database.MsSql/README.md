@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Database.MsSql
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 SQL Server provider integration for `Raycynix.Extensions.Database`.
 
 ## What It Provides
@@ -29,6 +31,26 @@ builder.Services
 ```
 
 ## Configuration
+
+Schema configuration is optional. `.AddMsSql()` preserves SQL Server's normal schema resolution.
+To set an application-wide default, use `.AddMsSql(options => options.DefaultSchema = "app")`
+or `DatabaseOptions:MsSqlServerOptions:DefaultSchema` in configuration. The default is `null`;
+empty or whitespace names are rejected.
+
+For individual entities, apply `[DatabaseSchema("sales")]` to a `GenericConfigurator<T>`
+or call `ConfigureEntity(modelBuilder).EntitySchema("sales")`.
+Precedence is fluent entity mapping, then the attribute, then `DefaultSchema`, then the
+provider/database default. `EntitySchema(null)` restores the model/provider default.
+
+The default schema is captured when the provider model configurator is first resolved and
+automatically participates in runtime and design-time model cache keys. Restart the application
+to change this application-wide setting. Custom configurators that select schemas at runtime
+must include those values in `GetModelShapeCacheKey()`.
+
+Identity and messaging Inbox/Outbox tables inherit this default unless explicitly mapped otherwise.
+`__EFMigrationsHistory` keeps its standard provider location; this option does not relocate it.
+
+### Connection settings
 
 ```json
 {

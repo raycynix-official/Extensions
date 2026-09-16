@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Exceptions.AspNetCore
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Exceptions.AspNetCore` adds ASP.NET Core middleware integration for Raycynix exceptions.
 
 ## What it contains

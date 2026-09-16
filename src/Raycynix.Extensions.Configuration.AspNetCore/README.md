@@ -1,10 +1,11 @@
 # Raycynix.Extensions.Configuration.AspNetCore
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Configuration.AspNetCore` adds ASP.NET Core-specific integrations for Raycynix configuration and feature flags.
 
 ## Package
 
-- Version: `3.0.0`
 - Target framework: `net10.0`
 - Built on ASP.NET Core 10.x
 

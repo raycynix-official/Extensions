@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Secrets
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Secrets` provides a unified secret-resolution layer for Raycynix applications.
 
 It allows application code to ask for secrets through `ISecretResolver` while the actual values can come from the standard configuration pipeline or environment-specific fallback providers.

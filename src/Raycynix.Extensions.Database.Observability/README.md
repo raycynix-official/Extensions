@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Database.Observability
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 Optional tracing and metrics integration for Raycynix database infrastructure operations.
 
 ## What It Provides

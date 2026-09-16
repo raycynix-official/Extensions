@@ -1,6 +1,8 @@
 # Raycynix.Extensions.Tracing.Abstractions
 
-Version `3.0.0` contains the shared identity and standard activity source used by Raycynix instrumentation.
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+This package contains the shared identity and standard activity source used by Raycynix instrumentation.
 
 ## API
 

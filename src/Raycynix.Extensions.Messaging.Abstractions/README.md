@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Messaging.Abstractions
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Messaging.Abstractions` contains the transport-neutral contracts used by Raycynix messaging packages.
 
 ## What it contains

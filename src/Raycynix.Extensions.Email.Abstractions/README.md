@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Email.Abstractions
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 Contracts and models shared by the Raycynix email packages.
 
 ## What It Provides

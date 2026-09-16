@@ -1,10 +1,11 @@
 # Raycynix.Extensions.Configuration
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Configuration` contains the core typed-configuration registration helpers for Raycynix applications.
 
 ## Package
 
-- Version: `3.0.0`
 - Target framework: `net10.0`
 - Built on `Microsoft.Extensions.Configuration` and `Microsoft.Extensions.Options` 10.x
 

@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Exceptions.Abstractions
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Exceptions.Abstractions` contains the contracts and shared models used by the Raycynix exceptions packages.
 
 ## What it contains

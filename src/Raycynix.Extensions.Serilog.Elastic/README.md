@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Serilog.Elastic
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Serilog.Elastic` connects the Raycynix Serilog pipeline to
 Elasticsearch or Elastic Cloud through the officially supported
 `Elastic.Serilog.Sinks` package. Events are written as ECS-compatible documents
@@ -8,7 +10,7 @@ to Elasticsearch data streams.
 ## Compatibility
 
 - .NET 10
-- `Raycynix.Extensions.Serilog` 3.0.0
+- `Raycynix.Extensions.Serilog` at the same shared release version
 - `Elastic.Serilog.Sinks` 9.0.0
 - Elastic Stack 8.15.0 or later, as required by the official sink 9.0.0
 

@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Serilog
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Serilog` is a thin, opinionated integration layer over Serilog for .NET hosted applications.
 
 The package does not replace `Microsoft.Extensions.Logging` and does not introduce a custom logger abstraction.
@@ -49,7 +51,7 @@ dotnet add package Raycynix.Extensions.Serilog
 
 ## Compatibility
 
-Version 3.0.0 targets .NET 10 and the Microsoft.Extensions 10 hosting stack. It
+The 3.x package line targets .NET 10 and the Microsoft.Extensions 10 hosting stack. It
 uses Serilog 4.3, Serilog.Extensions.Hosting 10, and
 Serilog.Settings.Configuration 10. Applications write through the standard
 Microsoft `ILogger<T>` API; direct use of the static Serilog logger is optional.

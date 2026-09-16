@@ -1,10 +1,11 @@
 # Raycynix.Extensions.Contracts.AspNetCore
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Contracts.AspNetCore` adds ASP.NET Core integration for the shared contract types defined in `Raycynix.Extensions.Contracts`.
 
 ## Package
 
-- Version: `3.0.0`
 - Target framework: `net10.0`
 - Built on ASP.NET Core 10.x
 

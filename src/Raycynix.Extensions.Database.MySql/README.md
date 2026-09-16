@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Database.MySql
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 MySQL provider integration for `Raycynix.Extensions.Database`.
 
 ## What It Provides
@@ -13,6 +15,19 @@ MySQL provider integration for `Raycynix.Extensions.Database`.
 The provider is selected by calling `.AddMySql(...)`.
 
 ## Usage
+
+### Schema behavior
+
+This package uses Oracle's `MySql.EntityFrameworkCore` provider. Generated queries and DDL
+preserve an explicitly mapped schema: `EntitySchema("sales")` with `EntityName("orders")`
+produces `sales.orders`. In MySQL this identifies a table in the `sales` database,
+not a namespace inside the connection's selected database.
+
+For normal single-database usage, omit `DatabaseSchema` / `EntitySchema` and select the database
+through `ConnectionOptions.Name` or `Database` in the connection string. There is no separate
+`MySqlOptions.DefaultSchema` option. PostgreSQL/SQL Server schema mappings have different semantics.
+
+### Registration
 
 ```csharp
 builder.Services

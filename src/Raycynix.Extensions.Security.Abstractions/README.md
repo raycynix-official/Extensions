@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Security.Abstractions
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Security.Abstractions` contains the transport-neutral contracts used by the Raycynix security and secrets packages.
 
 ## What it contains

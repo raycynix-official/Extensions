@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Database
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 Core EF Core database infrastructure for Raycynix applications.
 
 ## What It Provides
@@ -189,7 +191,22 @@ Table names are resolved in this order:
 2. `DatabaseTableAttribute` on the configurator
 3. entity type name
 
-If runtime values change the model shape, override `GetModelShapeCacheKey()`:
+Schemas are optional. Without a schema setting, the provider/database default is used.
+To opt in, add `[DatabaseSchema("sales")]` to the configurator or call
+`ConfigureEntity(modelBuilder).EntitySchema("sales")`. Fluent mapping overrides the attribute;
+`EntitySchema(null)` restores the model/provider default. `EntityName(...)` preserves the schema.
+
+PostgreSQL supports `.AddPostgreSql(options => options.DefaultSchema = "app")` and SQL Server
+supports `.AddMsSql(options => options.DefaultSchema = "app")` for an
+application-wide default, applied before entity configurators. Its value is included in model
+cache keys automatically. See the [PostgreSQL schema guide](../Raycynix.Extensions.Database.PostgreSql/README.md#table-schemas).
+
+Schema semantics depend on the provider: MySQL interprets a qualified schema as a database name,
+while SQLite ignores schema mappings. See the [MySQL](../Raycynix.Extensions.Database.MySql/README.md#schema-behavior)
+and [SQLite](../Raycynix.Extensions.Database.Sqlite/README.md#schema-behavior) notes before sharing mappings across providers.
+
+If runtime values change the model shape, including table names or schemas selected by a custom
+configurator, include all of them in `GetModelShapeCacheKey()`:
 
 ```csharp
 protected override string? GetModelShapeCacheKey()

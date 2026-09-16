@@ -1,6 +1,8 @@
 # Raycynix.Extensions.Tracing.AspNetCore
 
-Version `3.0.0` integrates the shared Raycynix `ActivitySource` with OpenTelemetry ASP.NET Core request instrumentation.
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+This package integrates the shared Raycynix `ActivitySource` with OpenTelemetry ASP.NET Core request instrumentation.
 
 ## Registration
 

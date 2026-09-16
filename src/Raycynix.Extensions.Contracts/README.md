@@ -1,10 +1,11 @@
 # Raycynix.Extensions.Contracts
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Contracts` contains reusable contract models and versioning conventions for shared .NET APIs.
 
 ## Package
 
-- Version: `3.0.0`
 - Target framework: `net10.0`
 - Transport-neutral and independent of ASP.NET Core
 

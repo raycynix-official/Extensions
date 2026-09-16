@@ -1,10 +1,11 @@
 # Raycynix.Extensions.Configuration.Abstractions
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Configuration.Abstractions` contains the contracts used by the Raycynix configuration packages.
 
 ## Package
 
-- Version: `3.0.0`
 - Target framework: `net10.0`
 - Built on Microsoft.Extensions abstractions 10.x
 
