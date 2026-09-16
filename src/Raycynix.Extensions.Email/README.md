@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Email
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 Shared email registration infrastructure for Raycynix applications.
 
 ## What It Provides

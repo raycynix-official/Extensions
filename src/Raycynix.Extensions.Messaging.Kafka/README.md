@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Messaging.Kafka
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Messaging.Kafka` contains the Kafka transport integration for Raycynix messaging.
 
 ## What it contains

@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Database.Abstractions
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 Contracts and configuration models shared by the Raycynix database packages.
 
 ## What It Provides
@@ -8,10 +10,12 @@ Contracts and configuration models shared by the Raycynix database packages.
 - `IDatabaseBuilder`
 - `IDatabaseInitializer`
 - `IDatabaseProviderRegistration`
+- `IDatabaseProviderModelConfigurator`
 - `IDatabaseModelAssemblyRegistry`
 - `IDatabaseObservability`
 - `IConfigurator` and `IGenericConfigurator<T>`
 - `DatabaseTableAttribute`
+- `DatabaseSchemaAttribute` for optional schema mapping on `GenericConfigurator<T>` implementations
 
 ## Provider Contracts
 
@@ -38,6 +42,10 @@ public interface IDatabaseProviderRegistration
 ```
 
 Common validation stays in `DatabaseOptions`. Provider-specific rules, such as whether `Host` or `Username` is required, belong in the provider implementation.
+
+Providers can also register `IDatabaseProviderModelConfigurator` to apply model defaults before
+entity configurators. Its `ProviderName` selects the active provider and `ModelCacheKey` must
+identify all settings that affect the model. PostgreSQL and SQL Server use this contract for `DefaultSchema`.
 
 ## Configurators
 

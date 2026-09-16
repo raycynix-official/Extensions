@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
+### Fixed
+
+- Replaced fixed delays in retry and dead-letter tests with acknowledgement completion signals to avoid stopping the consumer before publication.
+
 ## 3.0.0
 ### Changed
 - Retry delays and retry/dead-letter publication now observe host shutdown cancellation.

@@ -23,6 +23,7 @@ public sealed class PostgreSqlRegistrationTests
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["DatabaseOptions:ConnectionString"] = "Host=localhost;Database=test;",
+                ["DatabaseOptions:PostgreSqlOptions:DefaultSchema"] = "application",
                 ["DatabaseOptions:PostgreSqlOptions:Pooling"] = "false",
                 ["DatabaseOptions:PostgreSqlOptions:MinimumPoolSize"] = "2",
                 ["DatabaseOptions:PostgreSqlOptions:MaximumPoolSize"] = "25",
@@ -38,6 +39,7 @@ public sealed class PostgreSqlRegistrationTests
         var options = serviceProvider.GetRequiredService<PostgreSqlOptions>();
 
         options.Pooling.Should().BeFalse();
+        options.DefaultSchema.Should().Be("application");
         options.MinimumPoolSize.Should().Be(2);
         options.MaximumPoolSize.Should().Be(25);
         options.CommandTimeoutSeconds.Should().Be(45);

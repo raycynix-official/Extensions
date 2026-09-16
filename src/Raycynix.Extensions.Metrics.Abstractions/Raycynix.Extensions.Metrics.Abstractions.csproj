@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 removes the custom metrics service and instrument interfaces in favor of System.Diagnostics.Metrics, and provides the shared Raycynix meter identity and duration recording helper.</PackageReleaseNotes>
 
         <Description>Shared meter identity and System.Diagnostics.Metrics helpers for consistent Raycynix instrumentation without provider-specific contracts.</Description>
         <PackageTags>raycynix;metrics;abstractions;system-diagnostics-metrics;meter;histogram;instrumentation;opentelemetry;dotnet;net10</PackageTags>

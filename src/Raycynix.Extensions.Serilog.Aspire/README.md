@@ -1,13 +1,15 @@
 # Raycynix.Extensions.Serilog.Aspire
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Serilog.Aspire` adds the Raycynix Serilog pipeline to an
 Aspire AppHost through `IDistributedApplicationBuilder`.
 
 ## Compatibility
 
 - .NET 10
-- Aspire.Hosting 13.4.6
-- `Raycynix.Extensions.Serilog` 3.0.0
+- Aspire.Hosting 13.5.4
+- `Raycynix.Extensions.Serilog` at the same shared release version
 
 ## Installation
 

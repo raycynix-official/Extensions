@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
 
         <Description>ASP.NET Core integration for Raycynix contracts, with validated endpoint metadata, request and response contract headers, MVC attributes, Minimal API helpers, versioned results, and ModelState error conversion.</Description>
         <PackageTags>raycynix;contracts;aspnetcore;minimal-api;mvc;headers;contract-versioning;contract-metadata;http;middleware;results;validation;dotnet;net10</PackageTags>
-        <PackageReleaseNotes>v3.0.0 aligns the package with net10.0, validates contract identities when endpoints and results are configured, normalizes incoming contract names, validates ModelState error identities, and retains optional Microsoft.Extensions.Logging diagnostics.</PackageReleaseNotes>
 
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>

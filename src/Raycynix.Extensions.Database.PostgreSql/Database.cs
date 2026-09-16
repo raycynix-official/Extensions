@@ -37,6 +37,8 @@ public static class Database
 
         builder.Services.TryAddEnumerable(
             ServiceDescriptor.Singleton<IDatabaseProviderRegistration, PostgreSqlDatabaseProviderRegistration>());
+        builder.Services.TryAddEnumerable(
+            ServiceDescriptor.Singleton<IDatabaseProviderModelConfigurator, PostgreSqlProviderModelConfigurator>());
 
         return builder;
     }

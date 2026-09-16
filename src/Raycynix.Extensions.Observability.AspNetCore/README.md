@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Observability.AspNetCore
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Observability.AspNetCore` adds ASP.NET Core integration for Raycynix observability and includes the core observability registration.
 
 ## What it contains

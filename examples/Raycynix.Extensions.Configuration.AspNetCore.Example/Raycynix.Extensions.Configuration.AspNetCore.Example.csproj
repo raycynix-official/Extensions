@@ -6,8 +6,6 @@
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-
-        <Version>1.0.0-example</Version>
     </PropertyGroup>
 
     <PropertyGroup>

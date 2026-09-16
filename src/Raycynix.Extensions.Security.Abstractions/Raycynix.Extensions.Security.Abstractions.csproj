@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 validates authorization attributes, supports attributes on controller actions and methods, normalizes role and permission values, and rejects empty authorization requirements.</PackageReleaseNotes>
 
         <Description>Validated abstractions for Raycynix security contexts, authorization attributes, shared claims, RBAC permissions, and secret resolution contracts.</Description>
         <PackageTags>raycynix;security;authorization;abstractions;claims;rbac;permissions;secrets;contracts;validation;dotnet;net10</PackageTags>

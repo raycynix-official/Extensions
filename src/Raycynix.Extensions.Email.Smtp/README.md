@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Email.Smtp
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 SMTP provider integration for `Raycynix.Extensions.Email`.
 
 ## What It Provides

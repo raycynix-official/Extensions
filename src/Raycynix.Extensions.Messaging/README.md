@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Messaging
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Messaging` contains the transport-agnostic messaging foundation for Raycynix applications.
 
 ## What it contains

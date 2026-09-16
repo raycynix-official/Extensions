@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 replaces prometheus-net middleware with the stable OpenTelemetry metrics pipeline, adds ASP.NET Core request instrumentation, supports the shared Raycynix System.Diagnostics.Metrics meter, and leaves exporter selection to the application.</PackageReleaseNotes>
 
         <Description>Stable OpenTelemetry ASP.NET Core instrumentation for standard Raycynix System.Diagnostics.Metrics instruments, OTLP exporters, and Aspire.</Description>
         <PackageTags>raycynix;metrics;aspnetcore;opentelemetry;otlp;aspire;http;instrumentation;telemetry;dotnet;net10</PackageTags>
@@ -23,8 +20,8 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0"/>
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0"/>
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.18.0"/>
     </ItemGroup>
 
 </Project>

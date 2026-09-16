@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Messaging.RabbitMQ
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Messaging.RabbitMQ` contains the RabbitMQ transport integration for Raycynix messaging.
 
 ## What it contains

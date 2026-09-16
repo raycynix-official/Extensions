@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <Version>3.0.0</Version>
 
+    <PropertyGroup>
         <IsPackable>true</IsPackable>
-        <Title>Raycynix Serilog Elastic Integration</Title>
-        <PackageReleaseNotes>v3.0.0 integrates the official Elastic.Serilog.Sinks 9 pipeline, binds and validates ElasticSerilogOptions from Raycynix:Serilog:Elastic, supports Elasticsearch nodes and Elastic Cloud, API key and basic authentication, ECS data streams, ILM, channel buffering, proxy and TLS settings, and aligns the runtime dependency graph with the official sink.</PackageReleaseNotes>
 
         <Description>Validated Elastic.Serilog.Sinks integration for Raycynix Serilog, with Elasticsearch and Elastic Cloud connectivity, ECS data streams, authentication, buffering, proxy, TLS, ILM, and fail-fast startup validation.</Description>
         <PackageTags>raycynix;serilog;logging;structured-logging;elasticsearch;elastic;elastic-cloud;ecs;data-stream;ilm;api-key;basic-auth;buffering;proxy;tls;sink;dotnet;net10</PackageTags>
@@ -18,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Raycynix.Extensions.Serilog\Raycynix.Extensions.Serilog.csproj" />
+        <ProjectReference Include="..\Raycynix.Extensions.Serilog\Raycynix.Extensions.Serilog.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

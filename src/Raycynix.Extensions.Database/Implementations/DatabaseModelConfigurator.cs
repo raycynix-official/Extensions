@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Raycynix.Extensions.Database.Abstractions;
 using Raycynix.Extensions.Database.Abstractions.Options;
 using Raycynix.Extensions.Database.Abstractions.Configurators;
@@ -30,6 +31,10 @@ public sealed class DatabaseModelConfigurator(
             using var modelCreatingScope = observability.BeginOperation(providerName, "model_creating");
 
             var configurators = GetConfigurators();
+            foreach (var providerConfigurator in GetProviderConfigurators(providerName))
+            {
+                providerConfigurator.Configure(modelBuilder);
+            }
             observability.AddTag("database.configurator.count", configurators.Count.ToString());
             logger?.LogDebug(
                 "Configuring database model for provider {ProviderName}. Configurator count: {ConfiguratorCount}. Seed enabled: {SeedEnabled}.",
@@ -78,6 +83,10 @@ public sealed class DatabaseModelConfigurator(
     {
         return ConfiguratorProvider.Provide(serviceProvider, modelAssemblyRegistry.GetAll());
     }
+
+    private IEnumerable<IDatabaseProviderModelConfigurator> GetProviderConfigurators(string providerName) =>
+        serviceProvider.GetServices<IDatabaseProviderModelConfigurator>()
+            .Where(configurator => string.Equals(configurator.ProviderName, providerName, StringComparison.Ordinal));
     
     
     /// <summary>
@@ -100,6 +109,11 @@ public sealed class DatabaseModelConfigurator(
         return string.Join(
             "|",
             new[] { providerName, config.EnableSeed.ToString() }
+                .Concat(GetProviderConfigurators(providerName)
+                    .Select(static configurator => System.Text.Json.JsonSerializer.Serialize(new[]
+                    {
+                        configurator.GetType().FullName, configurator.ModelCacheKey
+                    })))
                 .Concat(configuratorKeys));
     }
 }

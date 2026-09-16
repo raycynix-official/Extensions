@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Messaging.Database
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Messaging.Database` adds persistent inbox and outbox storage for Raycynix messaging on top of `Raycynix.Extensions.Database`.
 
 ## Upgrading from 2.x
@@ -71,3 +73,11 @@ This package gives messaging persistence that survives process restarts, partici
 The database persistence package uses optional Microsoft `ILogger<T>` diagnostics when logging is registered in the application. No Raycynix logging provider is required.
 
 Diagnostics cover inbox/outbox status transitions, lease acquisition decisions, optimistic concurrency outcomes, and cleanup counts. Payloads, serialized headers, header values, and database connection details are not logged.
+
+## Table Schemas
+
+Inbox and Outbox tables inherit `PostgreSqlOptions.DefaultSchema` or `MsSqlServerOptions.DefaultSchema`
+from the shared database context. Their configured table names remain unchanged. No separate schema
+option is required in messaging persistence. Without a default schema, provider/database defaults apply.
+
+MySQL treats explicitly qualified schemas as database names; SQLite ignores schema mappings.

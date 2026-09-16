@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Observability
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Observability` contains the core observability composition for Raycynix applications.
 
 ## What it contains

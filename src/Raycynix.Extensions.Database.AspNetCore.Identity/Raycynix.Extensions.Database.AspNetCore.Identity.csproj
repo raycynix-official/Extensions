@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 adopts DatabaseOptions and ConnectionOptions for default, generic, and custom ASP.NET Core Identity database contexts.</PackageReleaseNotes>
 
         <Description>ASP.NET Core Identity EF Core integration with typed DatabaseOptions, default and custom contexts, model discovery, provider validation, and initialization.</Description>
         <PackageTags>raycynix;database;aspnetcore;identity;aspnetcore-identity;efcore;entityframework;options;identitydbcontext;custom-context;generic-identity;configurators;model-cache;migrations;initialization;provider-validation;dotnet;net10</PackageTags>
@@ -23,8 +20,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10"/>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.12" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
     </ItemGroup>
 
 </Project>

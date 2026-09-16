@@ -198,7 +198,7 @@ public sealed class RabbitMqRegistrationTests
             provider.GetRequiredService<IServiceScopeFactory>());
 
         await hostedService.StartAsync(TestContext.Current.CancellationToken);
-        await Task.Delay(200, TestContext.Current.CancellationToken);
+        await fakeConnectionFactory.Connection!.Acknowledged.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
         await hostedService.StopAsync(TestContext.Current.CancellationToken);
 
         fakeConnectionFactory.Connection!.PublishedExchange.Should().Be("integration.events");
@@ -304,7 +304,7 @@ public sealed class RabbitMqRegistrationTests
             provider.GetRequiredService<IServiceScopeFactory>());
 
         await hostedService.StartAsync(TestContext.Current.CancellationToken);
-        await Task.Delay(200, TestContext.Current.CancellationToken);
+        await fakeConnectionFactory.Connection!.Acknowledged.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
         await hostedService.StopAsync(TestContext.Current.CancellationToken);
 
         fakeConnectionFactory.Connection!.PublishedExchange.Should().Be("integration.dlx");
@@ -378,6 +378,8 @@ public sealed class RabbitMqRegistrationTests
         public Queue<RabbitMqIncomingDelivery> Deliveries { get; } = new();
 
         public List<ulong> AckedDeliveryTags { get; } = [];
+
+        public TaskCompletionSource Acknowledged { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public Task<IRabbitMqChannel> CreateChannelAsync(CancellationToken cancellationToken)
         {
@@ -461,6 +463,7 @@ public sealed class RabbitMqRegistrationTests
         public ValueTask BasicAckAsync(ulong deliveryTag, bool multiple, CancellationToken cancellationToken)
         {
             connection.AckedDeliveryTags.Add(deliveryTag);
+            connection.Acknowledged.TrySetResult();
             return new ValueTask(Task.CompletedTask);
         }
 

@@ -1,5 +1,9 @@
 <Project>
     <PropertyGroup>
+        <Version>3.0.1</Version>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
@@ -10,7 +14,7 @@
     <PropertyGroup>
         <PackageIcon>logo.png</PackageIcon>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <PackageReleaseNotes>See the package-local CHANGELOG.md for the full change history. Override PackageReleaseNotes in the package project file for major release-specific notes.</PackageReleaseNotes>
+        <PackageReleaseNotes>Raycynix.Extensions $(Version). All packages inherit the shared version from Directory.Build.props. See https://github.com/Raycynix/Extensions/blob/HEAD/src/$(MSBuildProjectName)/CHANGELOG.md for package-specific changes and https://github.com/Raycynix/Extensions/blob/HEAD/CHANGELOG.md for the release overview.</PackageReleaseNotes>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -32,7 +36,7 @@
         <PackageProjectUrl>https://github.com/Raycynix/Extensions</PackageProjectUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IncludeSymbols>true</IncludeSymbols>
@@ -41,7 +45,7 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        
+
         <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
 
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>

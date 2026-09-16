@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Common
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Common` contains shared primitives and helper utilities used across Raycynix extension packages.
 
 ## What it contains

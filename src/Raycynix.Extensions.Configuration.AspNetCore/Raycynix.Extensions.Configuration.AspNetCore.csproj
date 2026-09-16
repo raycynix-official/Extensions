@@ -1,13 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
 
         <Description>ASP.NET Core integrations for Raycynix appsettings and dotenv source setup, application environment registration, feature flag options, configurable feature gate middleware, endpoint metadata, and Minimal API feature gates.</Description>
         <PackageTags>raycynix;configuration;aspnetcore;dotenv;env-file;feature-flags;feature-gates;minimal-api;middleware;endpoints;options;typed-options;dotnet;net10</PackageTags>
-        <PackageReleaseNotes>v3.0.0 aligns the ASP.NET Core package with net10.0, resolves appsettings and optional .env files from the application content root, updates source setup APIs to use ConfigurationSourcesOptions naming, and documents feature gate options, middleware diagnostics, endpoint metadata, and Minimal API feature gates.</PackageReleaseNotes>
 
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>

@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 hardens exception middleware responses by excluding raw query strings and internal execution context, propagating request cancellation, and making operation context integration optional.</PackageReleaseNotes>
 
         <Description>ASP.NET Core middleware for secure structured Raycynix JSON error responses, validation errors, correlation metadata, and transient retry hints.</Description>
         <PackageTags>raycynix;exceptions;aspnetcore;middleware;web;http;error-handling;json;validation;security;dotnet;net10</PackageTags>

@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Database.AspNetCore.Identity
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 ASP.NET Core Identity integration for `Raycynix.Extensions.Database`.
 
 This package adds Raycynix-compatible `IdentityDbContext` implementations and service registration extensions for applications that store ASP.NET Core Identity data through the Raycynix database infrastructure.
@@ -142,3 +144,17 @@ await app.InitializeRaycynixDatabaseAsync();
 ## Migrating From 2.x
 
 Identity database registration now uses `DatabaseOptions` from `Raycynix.Extensions.Database.Abstractions.Options`. Rename the root and provider configuration sections to their 3.0 options type names.
+
+## Table Schemas
+
+Identity tables inherit the provider's optional default schema:
+
+```csharp
+builder.Services.AddRaycynixIdentityDatabase(builder.Configuration)
+    .AddPostgreSql(options => options.DefaultSchema = "identity");
+// Or: .AddMsSql(options => options.DefaultSchema = "identity");
+```
+
+Omit the option to retain the provider/database default. The common model configurator applies
+the schema to Identity mappings and includes it in the model cache key. Explicit per-entity
+mappings take precedence. Migration history remains in its standard provider location.

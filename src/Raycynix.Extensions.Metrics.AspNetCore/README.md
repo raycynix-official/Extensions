@@ -1,6 +1,8 @@
 # Raycynix.Extensions.Metrics.AspNetCore
 
-Version `3.0.0` integrates Raycynix `System.Diagnostics.Metrics` instruments with OpenTelemetry and ASP.NET Core request instrumentation.
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+This package integrates Raycynix `System.Diagnostics.Metrics` instruments with OpenTelemetry and ASP.NET Core request instrumentation.
 
 ## OTLP and Aspire
 

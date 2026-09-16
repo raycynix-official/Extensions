@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Security.AspNetCore
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 `Raycynix.Extensions.Security.AspNetCore` adds ASP.NET Core JWT authentication, dynamic authorization policies, and shared authorization-attribute integration for Raycynix security.
 
 ## What it contains

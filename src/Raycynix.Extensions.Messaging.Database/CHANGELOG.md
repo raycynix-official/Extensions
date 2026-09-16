@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1
+
+### Added
+
+- Verified Inbox/Outbox default-schema inheritance and generated DDL with PostgreSQL and SQL Server.
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
 ## 3.0.0
 ### Changed
 - Moved outbox availability, retention, ordering, and batch limits into provider-translated SQL queries.

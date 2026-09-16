@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 registers OpenTelemetry ASP.NET Core metrics and tracing instrumentation, validates correlation identifiers before logging and propagation, removes obsolete tracing middleware and implicit metrics endpoint mapping, and keeps health and exporter endpoints explicit.</PackageReleaseNotes>
 
         <Description>ASP.NET Core observability composition with correlation propagation, standard OpenTelemetry request metrics, tracing, and explicit health endpoint mapping.</Description>
         <PackageTags>raycynix;observability;aspnetcore;opentelemetry;metrics;tracing;middleware;healthchecks;http;correlation;propagation;dotnet;net10</PackageTags>

@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>Makes inbound retry and dead-letter handling cancellation-aware and replaces exception messages in transport headers with safe exception type identifiers.</PackageReleaseNotes>
 
         <Description>Kafka transport integration for Raycynix messaging with publisher registration, inbound consumer hosting, retry/dead-letter support, and configuration-based setup.</Description>
         <PackageTags>raycynix;messaging;kafka;events;producer;consumer;retry;dead-letter;configuration;dotnet</PackageTags>
@@ -18,8 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Confluent.Kafka" Version="2.15.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10"/>
+        <PackageReference Include="Confluent.Kafka" Version="2.15.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
     </ItemGroup>
 
     <ItemGroup>

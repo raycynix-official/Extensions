@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1
+
+### Added
+
+- Added optional DefaultSchema with configuration binding, validation, mapping precedence, and runtime/design-time model-cache isolation. Migration history remains unchanged.
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
 ## 3.0.0
 ### Changed
 - Renamed `MsSqlServerConfiguration` to `MsSqlServerOptions` and moved it to the `Options` namespace.

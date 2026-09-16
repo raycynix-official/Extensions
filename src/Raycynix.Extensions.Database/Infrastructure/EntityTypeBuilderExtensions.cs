@@ -8,22 +8,40 @@ namespace Raycynix.Extensions.Database.Infrastructure;
 /// </summary>
 public static class EntityTypeBuilderExtensions
 {
-    /// <summary>
-    /// Applies the specified table name to the current entity builder.
-    /// </summary>
-    /// <typeparam name="T">The entity type being configured.</typeparam>
     /// <param name="entityBuilder">The entity builder to configure.</param>
-    /// <param name="tableName">The table name to apply.</param>
-    /// <returns>The same entity builder instance.</returns>
-    public static EntityTypeBuilder<T> EntityName<T>(
-        this EntityTypeBuilder<T> entityBuilder,
-        string tableName)
-        where T : class
+    /// <typeparam name="T">The entity type being configured.</typeparam>
+    extension<T>(EntityTypeBuilder<T> entityBuilder) where T : class
     {
-        ArgumentNullException.ThrowIfNull(entityBuilder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(tableName);
+        /// <summary>
+        /// Applies the specified table name to the current entity builder.
+        /// </summary>
+        /// <param name="tableName">The table name to apply.</param>
+        /// <returns>The same entity builder instance.</returns>
+        public EntityTypeBuilder<T> EntityName(string tableName)
+        {
+            ArgumentNullException.ThrowIfNull(entityBuilder);
+            ArgumentException.ThrowIfNullOrWhiteSpace(tableName);
 
-        entityBuilder.ToTable(tableName);
-        return entityBuilder;
+            entityBuilder.Metadata.SetTableName(tableName);
+            return entityBuilder;
+        }
+
+        /// <summary>
+        /// Applies a table schema without changing the table name.
+        /// Pass <see langword="null"/> to use the model or provider default schema.
+        /// </summary>
+        /// <param name="schema">The schema name, or null to use the default.</param>
+        /// <returns>The same entity builder instance.</returns>
+        public EntityTypeBuilder<T> EntitySchema(string? schema)
+        {
+            ArgumentNullException.ThrowIfNull(entityBuilder);
+            if (schema is not null)
+            {
+                ArgumentException.ThrowIfNullOrWhiteSpace(schema);
+            }
+
+            entityBuilder.Metadata.SetSchema(schema);
+            return entityBuilder;
+        }
     }
 }

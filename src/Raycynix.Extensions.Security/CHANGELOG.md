@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.1
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
 ## 3.0.0
 ### Changed
 - Renamed `SecurityConfiguration` to `SecurityOptions` and moved it to `Raycynix.Extensions.Security.Options`.

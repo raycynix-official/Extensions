@@ -4,7 +4,22 @@
 
 `Raycynix.Extensions` is a set of infrastructure packages for .NET applications. The repository is organized as a modular collection of packages that can be combined selectively instead of pulling a single monolithic framework into every service.
 
-## What this repository contains
+## Versioning and release notes
+
+The current shared package version is **3.0.1**, declared once in the repository-root
+[Directory.Build.props](Directory.Build.props). All published packages under `src/`
+inherit this version; do not add package-local `Version` or `PackageVersion` overrides.
+Use matching release versions when combining Raycynix packages.
+
+For a release, update `Version` in `Directory.Build.props`, the [release overview](CHANGELOG.md),
+and each package's changelog. NuGet release notes inherit `$(Version)` and link to those changelogs.
+Test and example projects are not published packages and may retain their own version metadata.
+
+Version 3.0.1 adds optional database schema attributes and fluent mapping, PostgreSQL and SQL Server
+default-schema options, and schema-aware EF Core model caching. Schema configuration remains
+optional. See the [PostgreSQL schema guide](src/Raycynix.Extensions.Database.PostgreSql/README.md#table-schemas).
+
+## Package groups
 
 The solution is split by responsibility. The main package groups are:
 

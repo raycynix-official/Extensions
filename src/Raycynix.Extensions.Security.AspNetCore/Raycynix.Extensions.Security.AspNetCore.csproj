@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 adds configurable global and named rate limits, restricts subject partitions to authenticated principals, fails closed for incomplete security claims, unifies JWT binding with the core SecurityOptions pipeline, fixes direct JwtOptions injection, validates authority during options resolution, and hardens dynamic authorization policies.</PackageReleaseNotes>
 
         <Description>ASP.NET Core JWT authentication, configurable rate limiting, validated dynamic authorization policies, action attributes, and request security context wiring.</Description>
         <PackageTags>raycynix;security;aspnetcore;jwt;authorization;authentication;rate-limiting;throttling;policies;claims;options;validation;web;dotnet;net10</PackageTags>
@@ -23,7 +20,7 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
         <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="8.22.0"/>
         <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.22.0"/>
         <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="8.22.0"/>

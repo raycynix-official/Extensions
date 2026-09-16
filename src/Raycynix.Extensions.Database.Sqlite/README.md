@@ -1,5 +1,7 @@
 # Raycynix.Extensions.Database.Sqlite
 
+This package follows the shared version in [Directory.Build.props](../../Directory.Build.props). See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 SQLite provider integration for `Raycynix.Extensions.Database`.
 
 ## What It Provides
@@ -13,6 +15,16 @@ SQLite provider integration for `Raycynix.Extensions.Database`.
 The provider is selected by calling `.AddSqlite(...)`.
 
 ## Usage
+
+### Schema behavior
+
+EF Core's SQLite provider does not support relational schemas. Explicit schema metadata from
+`DatabaseSchema` or `EntitySchema` is ignored in generated queries and table-creation SQL;
+for example, `sales.orders` is emitted as the unqualified table `orders`.
+There is no `SqliteOptions.DefaultSchema` option. Use `.AddSqlite()` without schema configuration.
+Different schema names do not isolate tables with the same name in SQLite.
+
+### Registration
 
 ```csharp
 builder.Services

@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.0.1
+
+### Added
+
+- Added optional `PostgreSqlOptions.DefaultSchema`, configuration binding, and validation; explicit entity mappings override it and migration history remains unchanged.
+- Included the default schema in EF Core model cache keys.
+- Documented schema mapping with `DatabaseSchemaAttribute` and `EntitySchema(...)`, including default-schema fallback.
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
 ## 3.0.0
 ### Changed
 - Renamed `PostgreSqlConfiguration` to `PostgreSqlOptions` and moved it to the `Options` namespace.

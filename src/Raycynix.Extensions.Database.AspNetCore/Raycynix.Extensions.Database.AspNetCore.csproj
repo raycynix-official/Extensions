@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 updates ASP.NET Core database initialization for the DatabaseOptions-based 3.0 database contracts.</PackageReleaseNotes>
 
         <Description>ASP.NET Core startup integration for validated Raycynix database creation and migration initialization from WebApplication.</Description>
         <PackageTags>raycynix;database;aspnetcore;webapplication;web;startup;initialization;migrations;options;minimal-api;dotnet;net10</PackageTags>

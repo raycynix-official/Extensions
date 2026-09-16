@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>3.0.0</Version>
-
         <IsPackable>true</IsPackable>
-        <PackageReleaseNotes>v3.0.0 aligns the shared primitives package with the net10.0 Raycynix package line. Existing operation-context and helper APIs remain compatible.</PackageReleaseNotes>
         
         <Description>Shared infrastructure primitives and helpers for Raycynix applications, including operation context, assembly metadata helpers, and reusable disposable utilities.</Description>
         <PackageTags>raycynix;common;shared;helpers;context;correlation;assembly;disposable;infrastructure;dotnet</PackageTags>

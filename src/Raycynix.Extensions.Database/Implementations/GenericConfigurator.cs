@@ -71,6 +71,11 @@ public abstract class GenericConfigurator<T> : IGenericConfigurator<T> where T :
 
         var entityBuilder = modelBuilder.Entity<T>();
         entityBuilder.ToTable(ResolveTableName(tableName));
+        var schema = GetType().GetCustomAttribute<DatabaseSchemaAttribute>()?.Name;
+        if (schema is not null)
+        {
+            entityBuilder.Metadata.SetSchema(schema);
+        }
         return entityBuilder;
     }
 

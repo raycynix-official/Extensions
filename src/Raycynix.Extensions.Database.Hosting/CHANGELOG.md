@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.1
+
+### Changed
+
+- Inherit the shared package version from the repository-root `Directory.Build.props`; package-local version declarations have been removed.
+
 ## 3.0.0
 ### Changed
 - Updated generic-host initialization for the Database 3.0 options contracts.
