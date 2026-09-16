@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Raycynix.Extensions.Database.MsSql;
+using Raycynix.Extensions.Database.MsSql.Options;
 using Raycynix.Extensions.Database.PostgreSql;
 using Raycynix.Extensions.Database.PostgreSql.Options;
 using Raycynix.Extensions.Database.Abstractions.Attributes;
@@ -14,6 +16,72 @@ namespace Raycynix.Extensions.Database.Tests.Context;
 
 public sealed class DatabaseSchemaTests
 {
+    [Theory]
+    [InlineData(null)]
+    [InlineData("application")]
+    public void MsSqlDefaultSchema_ShouldApplyWithEntityOverrides(string? schema)
+    {
+        using var services = BuildMsSqlServices(schema);
+        using var scope = services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<RaycynixDatabaseContext>();
+
+        context.Model.GetDefaultSchema().Should().Be(schema);
+        context.Model.FindEntityType(typeof(DefaultEntity))!.GetSchema().Should().Be(schema);
+        context.Model.FindEntityType(typeof(SchemaEntity))!.GetSchema().Should().Be("sales");
+        context.Model.FindEntityType(typeof(RuntimeEntity))!.GetSchema().Should().Be("runtime");
+        var table = schema is null ? "[DefaultEntity]" : $"[{schema}].[DefaultEntity]";
+        context.Set<DefaultEntity>().ToQueryString().Should().Contain($"FROM {table} AS");
+        context.Database.GenerateCreateScript().Should().Contain($"CREATE TABLE {table}");
+        context.GetService<IHistoryRepository>().GetCreateScript()
+            .Should().Contain("CREATE TABLE [__EFMigrationsHistory]");
+    }
+
+    [Fact]
+    public void MsSqlDifferentDefaultSchemas_ShouldIsolateModelsInSharedCache()
+    {
+        using var firstServices = BuildMsSqlServices("first");
+        using var secondServices = BuildMsSqlServices("second");
+        using var firstScope = firstServices.CreateScope();
+        using var secondScope = secondServices.CreateScope();
+        using var repeatedScope = firstServices.CreateScope();
+        var first = firstScope.ServiceProvider.GetRequiredService<RaycynixDatabaseContext>();
+        var second = secondScope.ServiceProvider.GetRequiredService<RaycynixDatabaseContext>();
+        var repeated = repeatedScope.ServiceProvider.GetRequiredService<RaycynixDatabaseContext>();
+
+        first.GetService<IModelSource>().Should().BeSameAs(second.GetService<IModelSource>());
+        first.Model.Should().NotBeSameAs(second.Model);
+        repeated.Model.Should().BeSameAs(first.Model);
+        first.Set<DefaultEntity>().ToQueryString().Should().Contain("[first].[DefaultEntity]");
+        second.Set<DefaultEntity>().ToQueryString().Should().Contain("[second].[DefaultEntity]");
+        first.GetService<IModelCacheKeyFactory>().Create(first, true)
+            .Should().NotBe(second.GetService<IModelCacheKeyFactory>().Create(second, true));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void MsSqlDefaultSchema_ShouldRejectWhitespace(string schema)
+    {
+        Action action = () => new MsSqlServerOptions { DefaultSchema = schema }.Validate();
+        action.Should().Throw<ArgumentException>();
+    }
+
+    private static ServiceProvider BuildMsSqlServices(string? schema)
+    {
+        var services = new ServiceCollection();
+        var builder = services.AddRaycynixDatabase(new ConfigurationBuilder().Build(), options =>
+        {
+            options.ConnectionString = "Server=localhost;Database=schema_tests;Trusted_Connection=true";
+            options.EnableSeed = false;
+        }, registerCallerAssembly: false);
+        if (schema is null)
+            builder.AddMsSql();
+        else
+            builder.AddMsSql(options => options.DefaultSchema = schema);
+        builder.AddAssembly<DefaultEntity>();
+        return services.BuildServiceProvider(validateScopes: true);
+    }
+
     [Fact]
     public void PostgreSqlWithoutSchemaConfiguration_ShouldLeaveSchemaResolutionToDatabase()
     {

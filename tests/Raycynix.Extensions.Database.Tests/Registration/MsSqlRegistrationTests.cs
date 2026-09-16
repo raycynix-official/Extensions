@@ -23,6 +23,7 @@ public sealed class MsSqlRegistrationTests
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["DatabaseOptions:ConnectionString"] = "Server=localhost;Database=test;",
+                ["DatabaseOptions:MsSqlServerOptions:DefaultSchema"] = "application",
                 ["DatabaseOptions:MsSqlServerOptions:TrustServerCertificate"] = "false",
                 ["DatabaseOptions:MsSqlServerOptions:CommandTimeoutSeconds"] = "45",
                 ["DatabaseOptions:MsSqlServerOptions:MultipleActiveResultSets"] = "true"
@@ -36,6 +37,7 @@ public sealed class MsSqlRegistrationTests
         var options = serviceProvider.GetRequiredService<MsSqlServerOptions>();
 
         options.TrustServerCertificate.Should().BeFalse();
+        options.DefaultSchema.Should().Be("application");
         options.CommandTimeoutSeconds.Should().Be(45);
         options.MultipleActiveResultSets.Should().BeTrue();
     }

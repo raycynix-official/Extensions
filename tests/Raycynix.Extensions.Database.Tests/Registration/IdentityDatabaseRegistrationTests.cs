@@ -10,6 +10,8 @@ using Raycynix.Extensions.Database.AspNetCore.Identity;
 using Raycynix.Extensions.Database.Implementations;
 using Raycynix.Extensions.Database.Infrastructure;
 using Raycynix.Extensions.Database.Sqlite;
+using Raycynix.Extensions.Database.PostgreSql;
+using Raycynix.Extensions.Database.MsSql;
 
 namespace Raycynix.Extensions.Database.Tests.Registration;
 
@@ -18,6 +20,39 @@ namespace Raycynix.Extensions.Database.Tests.Registration;
 /// </summary>
 public sealed class IdentityDatabaseRegistrationTests
 {
+    [Theory]
+    [InlineData(false, null)]
+    [InlineData(false, "identity")]
+    [InlineData(true, null)]
+    [InlineData(true, "identity")]
+    public void IdentityTables_ShouldInheritProviderDefaultSchema(bool sqlServer, string? schema)
+    {
+        var services = CreateServices();
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["DatabaseOptions:ConnectionString"] = sqlServer
+                ? "Server=localhost;Database=identity_tests;Trusted_Connection=true"
+                : "Host=localhost;Database=identity_tests",
+            ["DatabaseOptions:EnableSeed"] = "false"
+        }).Build();
+        var builder = services.AddRaycynixIdentityDatabase(configuration, registerCallerAssembly: false);
+        if (sqlServer)
+            builder.AddMsSql(options => options.DefaultSchema = schema);
+        else
+            builder.AddPostgreSql(options => options.DefaultSchema = schema);
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<RaycynixIdentityDatabaseContext>();
+
+        context.Model.GetEntityTypes().Should().HaveCount(7);
+        context.Model.GetEntityTypes().Should().OnlyContain(entity => entity.GetSchema() == schema);
+        var table = sqlServer ? "[AspNetUsers]" : "\"AspNetUsers\"";
+        var qualifiedTable = schema is null ? table : sqlServer ? $"[{schema}].{table}" : $"{schema}.{table}";
+        context.Users.ToQueryString().Should().Contain($"FROM {qualifiedTable} AS");
+        context.Database.GenerateCreateScript().Should().Contain($"CREATE TABLE {qualifiedTable}");
+    }
+
     /// <summary>
     /// Verifies that the default Identity database registration resolves the default context and Identity model.
     /// </summary>
