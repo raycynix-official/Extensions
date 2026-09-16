@@ -6,6 +6,12 @@ namespace Raycynix.Extensions.Database.PostgreSql.Options;
 public sealed class PostgreSqlOptions
 {
     /// <summary>
+    /// Gets or sets the default entity schema. Null preserves the provider default.
+    /// Explicit entity mappings override this value. Migration history is unaffected.
+    /// </summary>
+    public string? DefaultSchema { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether connection pooling is enabled.
     /// </summary>
     public bool Pooling { get; set; } = true;
@@ -35,6 +41,11 @@ public sealed class PostgreSqlOptions
     /// </summary>
     public void Validate()
     {
+        if (DefaultSchema is not null)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(DefaultSchema);
+        }
+
         if (MinimumPoolSize < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(MinimumPoolSize), "Minimum pool size cannot be negative.");
