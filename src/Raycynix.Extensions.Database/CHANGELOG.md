@@ -12,6 +12,7 @@
 
 - Database startup initialization now initializes every registered context.
 - Kept the original unkeyed services available for existing single-context applications.
+- Assemblies registered before a database context are now preserved when its isolated model registry is created.
 
 ## 3.0.1
 
