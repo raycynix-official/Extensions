@@ -4,4 +4,6 @@ namespace Raycynix.Extensions.Database.Abstractions.Configurators;
 /// Defines a typed configurator for an entity.
 /// </summary>
 /// <typeparam name="T">The entity type handled by the configurator.</typeparam>
-public interface IGenericConfigurator<T> : IConfigurator where T : class { }
+public interface IGenericConfigurator<T> : IConfigurator where T : class
+{
+}
