@@ -74,7 +74,7 @@ public class DatabaseRegistrationExtensions
             if (setup is not null)
             {
                 throw new InvalidOperationException(
-                    "Raycynix database is already registered. Configure DatabaseOptions only on the first AddRaycynixDatabase call.");
+                    "Raycynix database is already registered. Configure DatabaseOptions only on the first AddRaycynixDatabase call");
             }
 
             return new DatabaseBuilder(
@@ -147,14 +147,14 @@ public class DatabaseRegistrationExtensions
                 var providerRegistration = providerDescriptor.Registration;
 
                 logger?.LogDebug(
-                    "Configuring DbContext {DbContextType} with database provider {ProviderName}. Migrations assembly: {MigrationsAssembly}.",
+                    "Configuring DbContext {DbContextType} with database provider {ProviderName}. Migrations assembly: {MigrationsAssembly}",
                     typeof(TContext).Name,
                     providerDescriptor.ProviderName,
                     migrationsAssembly.GetName().Name);
 
                 providerRegistration.Validate(config);
                 logger?.LogDebug(
-                    "Database configuration validated for DbContext {DbContextType} with provider {ProviderName}.",
+                    "Database configuration validated for DbContext {DbContextType} with provider {ProviderName}",
                     typeof(TContext).Name,
                     providerDescriptor.ProviderName);
 
@@ -163,7 +163,7 @@ public class DatabaseRegistrationExtensions
                 providerRegistration.Configure(options, connectionString, config, migrationsAssembly, serviceProvider);
 
                 logger?.LogDebug(
-                    "DbContext {DbContextType} configured with database provider {ProviderName}.",
+                    "DbContext {DbContextType} configured with database provider {ProviderName}",
                     typeof(TContext).Name,
                     providerDescriptor.ProviderName);
             });
