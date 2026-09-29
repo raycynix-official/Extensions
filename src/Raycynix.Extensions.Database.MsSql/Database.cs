@@ -1,5 +1,8 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Raycynix.Extensions.Configuration;
 using Raycynix.Extensions.Configuration.Abstractions.Interfaces;
 using Raycynix.Extensions.Database.Abstractions;
@@ -26,19 +29,46 @@ public static class Database
     {
         ArgumentNullException.ThrowIfNull(builder);
 
+        var optionsName = builder.OptionsName;
         builder.Services.AddRaycynixConfiguration<MsSqlServerOptions>(
             builder.Configuration,
-            $"{nameof(DatabaseOptions)}:{nameof(MsSqlServerOptions)}",
-            configurePostBind: configure);
+            $"{builder.ConfigurationSectionName}:{nameof(MsSqlServerOptions)}",
+            optionsName: optionsName,
+            configurePostBind: builder.ContextName is null ? configure : null);
+        if (builder.ContextConfigurationSectionName is { } contextSectionName)
+        {
+            builder.Services.AddOptions<MsSqlServerOptions>(optionsName)
+                .Bind(builder.Configuration.GetSection($"{contextSectionName}:{nameof(MsSqlServerOptions)}"))
+                .PostConfigure(options => configure?.Invoke(options));
+        }
+
         builder.Services.AddRaycynixConfigurationValidator<MsSqlServerOptions, MsSqlServerOptionsValidator>();
-
         builder.Services.TryAddSingleton(serviceProvider =>
-            serviceProvider.GetRequiredService<IConfigurationAccessor<MsSqlServerOptions>>().Current);
+            serviceProvider.GetRequiredService<IOptionsMonitor<MsSqlServerOptions>>().Get(optionsName)
+        );
 
-        builder.Services.TryAddEnumerable(ServiceDescriptor
-            .Singleton<IDatabaseProviderRegistration, MsSqlServerDatabaseProviderRegistration>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor
-            .Singleton<IDatabaseProviderModelConfigurator, MsSqlServerProviderModelConfigurator>());
+        builder.Services.AddKeyedSingleton<IDatabaseProviderRegistration>(
+            builder.ContextType, (serviceProvider, _) =>
+                new MsSqlServerDatabaseProviderRegistration(
+                    serviceProvider.GetRequiredService<IOptionsMonitor<MsSqlServerOptions>>().Get(optionsName),
+                    serviceProvider.GetService<ILogger<MsSqlServerDatabaseProviderRegistration>>()
+                )
+        );
+
+        builder.Services.AddKeyedSingleton<IDatabaseProviderModelConfigurator>(
+            builder.ContextType, (serviceProvider, _) =>
+                new MsSqlServerProviderModelConfigurator(
+                    serviceProvider.GetRequiredService<IOptionsMonitor<MsSqlServerOptions>>().Get(optionsName)
+                )
+        );
+
+        if (optionsName == Microsoft.Extensions.Options.Options.DefaultName)
+        {
+            builder.Services.AddSingleton<IDatabaseProviderRegistration>(serviceProvider =>
+                serviceProvider.GetRequiredKeyedService<IDatabaseProviderRegistration>(builder.ContextType));
+            builder.Services.AddSingleton<IDatabaseProviderModelConfigurator>(serviceProvider =>
+                serviceProvider.GetRequiredKeyedService<IDatabaseProviderModelConfigurator>(builder.ContextType));
+        }
 
         return builder;
     }
