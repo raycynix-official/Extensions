@@ -62,7 +62,7 @@ public class DatabaseRegistrationExtensions
             ?.ImplementationInstance as DatabaseContextDescriptor<TContext>;
         var optionsName = existingDescriptor?.OptionsName ?? newOptionsName;
         var modelAssemblyRegistry = existingDescriptor is null
-            ? new DatabaseModelAssemblyRegistry()
+            ? DatabaseModelAssemblyRegistry.GetOrCreate(services, typeof(TContext))
             : existingDescriptor.ModelAssemblyRegistry;
         if (modelAssembly is not null)
         {
@@ -101,8 +101,6 @@ public class DatabaseRegistrationExtensions
 
         services.AddRaycynixConfigurationValidator<DatabaseOptions, DatabaseOptionsValidator>();
         services.TryAddSingleton<IDatabaseObservability, NoOpDatabaseObservability>();
-        services.AddKeyedSingleton<IDatabaseModelAssemblyRegistry>(typeof(TContext), modelAssemblyRegistry);
-
         var contextDescriptor = new DatabaseContextDescriptor<TContext>
         {
             ContextType = typeof(TContext),

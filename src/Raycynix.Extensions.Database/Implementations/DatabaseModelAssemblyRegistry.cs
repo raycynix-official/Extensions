@@ -55,6 +55,21 @@ public sealed class DatabaseModelAssemblyRegistry : IDatabaseModelAssemblyRegist
         }
 
         var registry = new DatabaseModelAssemblyRegistry();
+        if (serviceKey is not null)
+        {
+            var pendingRegistry = services
+                .FirstOrDefault(static descriptor =>
+                    descriptor.ServiceType == typeof(DatabaseModelAssemblyRegistry))
+                ?.ImplementationInstance as DatabaseModelAssemblyRegistry;
+            if (pendingRegistry is not null)
+            {
+                foreach (var assembly in pendingRegistry.GetAll())
+                {
+                    registry.Add(assembly);
+                }
+            }
+        }
+
         if (serviceKey is null)
         {
             services.AddSingleton(registry);

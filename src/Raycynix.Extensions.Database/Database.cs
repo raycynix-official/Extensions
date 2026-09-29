@@ -245,7 +245,10 @@ public static class Database
             ArgumentNullException.ThrowIfNull(services);
             ArgumentNullException.ThrowIfNull(assembly);
 
-            var registries = services
+            var pendingRegistry = DatabaseModelAssemblyRegistry.GetOrCreate(services);
+            pendingRegistry.Add(assembly);
+
+            var contextRegistries = services
                 .Where(static descriptor => descriptor.ServiceType == typeof(IDatabaseModelAssemblyRegistry))
                 .Select(static descriptor => descriptor.IsKeyedService
                     ? descriptor.KeyedImplementationInstance
@@ -254,16 +257,9 @@ public static class Database
                 .Distinct()
                 .ToArray();
 
-            if (registries.Length == 0)
+            foreach (var registry in contextRegistries)
             {
-                DatabaseModelAssemblyRegistry.GetOrCreate(services).Add(assembly);
-            }
-            else
-            {
-                foreach (var registry in registries)
-                {
-                    registry.Add(assembly);
-                }
+                registry.Add(assembly);
             }
 
             return services;
