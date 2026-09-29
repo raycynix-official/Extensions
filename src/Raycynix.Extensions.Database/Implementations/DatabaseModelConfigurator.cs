@@ -14,15 +14,20 @@ namespace Raycynix.Extensions.Database.Implementations;
 /// <param name="modelAssemblyRegistry">The registry of assemblies that contribute model configurators.</param>
 /// <param name="observability">The observability implementation used to record model-building operations.</param>
 /// <param name="serviceProvider">The service provider used to activate configurators.</param>
+/// <param name="providerConfigurators">Provider model configurators isolated for the current context.</param>
 /// <param name="logger">The optional logger used to record model configuration diagnostics.</param>
 public sealed class DatabaseModelConfigurator(
     DatabaseOptions config,
     IDatabaseModelAssemblyRegistry modelAssemblyRegistry,
     IDatabaseObservability observability,
     IServiceProvider serviceProvider,
+    IEnumerable<IDatabaseProviderModelConfigurator>? providerConfigurators = null,
     ILogger<DatabaseModelConfigurator>? logger = null)
     : IDatabaseModelConfigurator
 {
+    private readonly IDatabaseProviderModelConfigurator[] _providerConfigurators =
+        providerConfigurators?.ToArray() ?? [];
+
     /// <inheritdoc />
     public void Configure(ModelBuilder modelBuilder, string providerName)
     {
@@ -35,9 +40,10 @@ public sealed class DatabaseModelConfigurator(
             {
                 providerConfigurator.Configure(modelBuilder);
             }
+
             observability.AddTag("database.configurator.count", configurators.Count.ToString());
             logger?.LogDebug(
-                "Configuring database model for provider {ProviderName}. Configurator count: {ConfiguratorCount}. Seed enabled: {SeedEnabled}.",
+                "Configuring database model for provider {ProviderName}. Configurator count: {ConfiguratorCount}. Seed enabled: {SeedEnabled}",
                 providerName,
                 configurators.Count,
                 config.EnableSeed);
@@ -45,7 +51,7 @@ public sealed class DatabaseModelConfigurator(
             foreach (var configurator in configurators)
             {
                 logger?.LogDebug(
-                    "Applying database model configurator {ConfiguratorType} for provider {ProviderName}.",
+                    "Applying database model configurator {ConfiguratorType} for provider {ProviderName}",
                     configurator.GetType().Name,
                     providerName);
 
@@ -54,7 +60,7 @@ public sealed class DatabaseModelConfigurator(
                 if (config.EnableSeed)
                 {
                     logger?.LogDebug(
-                        "Applying database seed from configurator {ConfiguratorType} for provider {ProviderName}.",
+                        "Applying database seed from configurator {ConfiguratorType} for provider {ProviderName}",
                         configurator.GetType().Name,
                         providerName);
                     configurator.Seed(modelBuilder);
@@ -63,32 +69,32 @@ public sealed class DatabaseModelConfigurator(
 
             observability.RecordSuccess(providerName, "model_creating");
             logger?.LogDebug(
-                "Database model configuration completed for provider {ProviderName}.",
+                "Database model configuration completed for provider {ProviderName}",
                 providerName);
-
         }
         catch (Exception ex)
         {
             observability.RecordFailure(providerName, "model_creating");
             logger?.LogError(
                 ex,
-                "Database model configuration failed for provider {ProviderName}.",
+                "Database model configuration failed for provider {ProviderName}",
                 providerName);
             throw new Exception("Failed to configure database model", ex);
-            
         }
     }
-    
+
     private List<IConfigurator> GetConfigurators()
     {
         return ConfiguratorProvider.Provide(serviceProvider, modelAssemblyRegistry.GetAll());
     }
 
     private IEnumerable<IDatabaseProviderModelConfigurator> GetProviderConfigurators(string providerName) =>
-        serviceProvider.GetServices<IDatabaseProviderModelConfigurator>()
-            .Where(configurator => string.Equals(configurator.ProviderName, providerName, StringComparison.Ordinal));
-    
-    
+        (_providerConfigurators.Length > 0
+            ? _providerConfigurators
+            : serviceProvider.GetServices<IDatabaseProviderModelConfigurator>())
+        .Where(configurator => string.Equals(configurator.ProviderName, providerName, StringComparison.Ordinal));
+
+
     /// <summary>
     /// Builds the cache key fragment representing the active provider, seed mode, and applied configurators.
     /// </summary>
@@ -101,7 +107,7 @@ public sealed class DatabaseModelConfigurator(
             .ToArray();
 
         logger?.LogDebug(
-            "Created database model cache key for provider {ProviderName}. Configurator key count: {ConfiguratorKeyCount}. Seed enabled: {SeedEnabled}.",
+            "Created database model cache key for provider {ProviderName}. Configurator key count: {ConfiguratorKeyCount}. Seed enabled: {SeedEnabled}",
             providerName,
             configuratorKeys.Length,
             config.EnableSeed);

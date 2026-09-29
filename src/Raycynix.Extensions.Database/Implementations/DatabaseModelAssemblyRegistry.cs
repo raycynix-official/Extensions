@@ -30,25 +30,40 @@ public sealed class DatabaseModelAssemblyRegistry : IDatabaseModelAssemblyRegist
     public IReadOnlyCollection<Assembly> GetAll()
     {
         lock (_sync)
-            return _assemblies.ToArray();
+            return [.. _assemblies];
     }
 
     /// <summary>
     /// Gets the existing shared registry from the service collection or creates and registers a new one.
     /// </summary>
     /// <param name="services">The service collection that owns the registry.</param>
+    /// <param name="serviceKey">The optional context key that owns an isolated registry.</param>
     /// <returns>The shared model assembly registry instance.</returns>
-    public static DatabaseModelAssemblyRegistry GetOrCreate(IServiceCollection services)
+    public static DatabaseModelAssemblyRegistry GetOrCreate(IServiceCollection services, object? serviceKey = null)
     {
-        if (services
-                .FirstOrDefault(static descriptor => descriptor.ServiceType == typeof(DatabaseModelAssemblyRegistry))
-                ?.ImplementationInstance is DatabaseModelAssemblyRegistry existingRegistry)
+        var serviceType = serviceKey is null
+            ? typeof(DatabaseModelAssemblyRegistry)
+            : typeof(IDatabaseModelAssemblyRegistry);
+        var descriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == serviceType
+                                                               && Equals(descriptor.ServiceKey, serviceKey));
+        var implementation = serviceKey is null
+            ? descriptor?.ImplementationInstance
+            : descriptor?.KeyedImplementationInstance;
+        if (implementation is DatabaseModelAssemblyRegistry existingRegistry)
         {
             return existingRegistry;
         }
 
         var registry = new DatabaseModelAssemblyRegistry();
-        services.AddSingleton(registry);
+        if (serviceKey is null)
+        {
+            services.AddSingleton(registry);
+        }
+        else
+        {
+            services.AddKeyedSingleton<IDatabaseModelAssemblyRegistry>(serviceKey, registry);
+        }
+
         return registry;
     }
 }

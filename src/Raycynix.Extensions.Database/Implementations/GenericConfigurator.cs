@@ -48,7 +48,7 @@ public abstract class GenericConfigurator<T> : IGenericConfigurator<T> where T :
     {
         ConfigureEntity(modelBuilder);
     }
-    
+
     /// <summary>
     /// Seeds data for <typeparamref name="T"/> during model creation.
     /// </summary>
@@ -76,6 +76,7 @@ public abstract class GenericConfigurator<T> : IGenericConfigurator<T> where T :
         {
             entityBuilder.Metadata.SetSchema(schema);
         }
+
         return entityBuilder;
     }
 
