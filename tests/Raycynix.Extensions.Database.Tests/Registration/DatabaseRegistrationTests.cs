@@ -297,6 +297,37 @@ public sealed class DatabaseRegistrationTests
     }
 
     /// <summary>
+    /// Verifies that assemblies registered before the context are copied into its isolated model registry.
+    /// </summary>
+    [Fact]
+    public void AddRaycynixDatabaseAssembly_BeforeDatabaseRegistration_ShouldIncludeConfigurators()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(typeof(ILogger<>), typeof(FakeLogger<>));
+        services.AddSingleton(new MessagingDatabasePersistenceConfiguration());
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["DatabaseOptions:ConnectionString"] = "Data Source=pending-model-test.db",
+                ["DatabaseOptions:EnsureCreated"] = "false",
+                ["DatabaseOptions:EnableSeed"] = "false"
+            })
+            .Build();
+
+        services.AddRaycynixDatabaseAssembly(typeof(MessagingInboxEntryEntity).Assembly);
+        services.AddRaycynixDatabase(configuration, registerCallerAssembly: false)
+            .AddSqlite();
+
+        using var serviceProvider = services.BuildServiceProvider(validateScopes: true);
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<RaycynixDatabaseContext>();
+
+        context.Model.FindEntityType(typeof(MessagingInboxEntryEntity)).Should().NotBeNull();
+        context.Model.FindEntityType(typeof(MessagingOutboxEntryEntity)).Should().NotBeNull();
+    }
+
+    /// <summary>
     /// Verifies that the fluent database builder can register additional configurator assemblies.
     /// </summary>
     [Fact]
