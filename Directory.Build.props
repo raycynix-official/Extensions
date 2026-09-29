@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>3.0.1</Version>
+        <Version>3.1.0</Version>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -14,7 +14,7 @@
     <PropertyGroup>
         <PackageIcon>logo.png</PackageIcon>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <PackageReleaseNotes>Raycynix.Extensions $(Version). All packages inherit the shared version from Directory.Build.props. See https://github.com/Raycynix/Extensions/blob/HEAD/src/$(MSBuildProjectName)/CHANGELOG.md for package-specific changes and https://github.com/Raycynix/Extensions/blob/HEAD/CHANGELOG.md for the release overview.</PackageReleaseNotes>
+        <PackageReleaseNotes>Raycynix.Extensions $(Version). All packages inherit the shared version from Directory.Build.props. See https://github.com/raycynix/Raycynix.Extensions/blob/HEAD/src/$(MSBuildProjectName)/CHANGELOG.md for package-specific changes and https://github.com/raycynix/Raycynix.Extensions/blob/HEAD/CHANGELOG.md for the release overview.</PackageReleaseNotes>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -32,8 +32,8 @@
 
     <PropertyGroup>
         <Copyright>Copyright © $([System.DateTime]::Now.Year) Raycynix</Copyright>
-        <RepositoryUrl>https://github.com/Raycynix/Extensions</RepositoryUrl>
-        <PackageProjectUrl>https://github.com/Raycynix/Extensions</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/raycynix/Raycynix.Extensions</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/raycynix/Raycynix.Extensions</PackageProjectUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
