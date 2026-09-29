@@ -1,5 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,6 +14,7 @@ using Raycynix.Extensions.Database.Implementations;
 using Raycynix.Extensions.Database.Infrastructure;
 using Raycynix.Extensions.Database.PostgreSql;
 using Raycynix.Extensions.Database.Sqlite;
+using Raycynix.Extensions.Database.Sqlite.Options;
 using Raycynix.Extensions.Messaging.Database.Configurations;
 using Raycynix.Extensions.Messaging.Database.Models;
 
@@ -294,6 +297,37 @@ public sealed class DatabaseRegistrationTests
     }
 
     /// <summary>
+    /// Verifies that assemblies registered before the context are copied into its isolated model registry.
+    /// </summary>
+    [Fact]
+    public void AddRaycynixDatabaseAssembly_BeforeDatabaseRegistration_ShouldIncludeConfigurators()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(typeof(ILogger<>), typeof(FakeLogger<>));
+        services.AddSingleton(new MessagingDatabasePersistenceConfiguration());
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["DatabaseOptions:ConnectionString"] = "Data Source=pending-model-test.db",
+                ["DatabaseOptions:EnsureCreated"] = "false",
+                ["DatabaseOptions:EnableSeed"] = "false"
+            })
+            .Build();
+
+        services.AddRaycynixDatabaseAssembly(typeof(MessagingInboxEntryEntity).Assembly);
+        services.AddRaycynixDatabase(configuration, registerCallerAssembly: false)
+            .AddSqlite();
+
+        using var serviceProvider = services.BuildServiceProvider(validateScopes: true);
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<RaycynixDatabaseContext>();
+
+        context.Model.FindEntityType(typeof(MessagingInboxEntryEntity)).Should().NotBeNull();
+        context.Model.FindEntityType(typeof(MessagingOutboxEntryEntity)).Should().NotBeNull();
+    }
+
+    /// <summary>
     /// Verifies that the fluent database builder can register additional configurator assemblies.
     /// </summary>
     [Fact]
@@ -375,6 +409,74 @@ public sealed class DatabaseRegistrationTests
         builder.CallerAssembly.GetName().Name.Should().Be(typeof(DatabaseRegistrationTests).Assembly.GetName().Name);
     }
 
+    /// <summary>
+    /// Verifies that contexts have independent options, providers, model services, and initializers.
+    /// </summary>
+    [Fact]
+    public void AddRaycynixDatabase_ShouldIsolateMultipleContexts()
+    {
+        var services = new ServiceCollection();
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["DatabaseOptions:ConnectionString"] = "Data Source=shared.db",
+                ["DatabaseOptions:EnsureCreated"] = "false",
+                ["DatabaseOptions:RetryCount"] = "7",
+                ["DatabaseOptions:SqliteOptions:CommandTimeoutSeconds"] = "30",
+                ["DatabaseOptions:Contexts:Primary:EnableSeed"] = "false",
+                ["DatabaseOptions:Contexts:Primary:UseQueryTrackingByDefault"] = "false",
+                ["DatabaseOptions:Contexts:Primary:MigrationsHistoryTable"] =
+                    "__PrimaryMigrationsHistory",
+                ["DatabaseOptions:Contexts:Primary:SqliteOptions:CommandTimeoutSeconds"] = "11",
+                ["DatabaseOptions:Contexts:Audit:EnableSeed"] = "true",
+                ["DatabaseOptions:Contexts:Audit:MigrationsHistoryTable"] =
+                    "__AuditMigrationsHistory"
+            })
+            .Build();
+
+        var primaryBuilder = services
+            .AddRaycynixDatabase<PrimaryDatabaseContext>(
+                configuration,
+                "Primary",
+                options => options.RetryCount = 9,
+                registerCallerAssembly: false)
+            .AddSqlite(options => options.CommandTimeoutSeconds = 13);
+        var auditBuilder = services
+            .AddRaycynixDatabase<AuditDatabaseContext>(
+                configuration, "Audit", registerCallerAssembly: false)
+            .AddSqlite();
+
+        using var serviceProvider = services.BuildServiceProvider(validateScopes: true);
+        using var scope = serviceProvider.CreateScope();
+        var primary = scope.ServiceProvider.GetRequiredService<PrimaryDatabaseContext>();
+        var audit = scope.ServiceProvider.GetRequiredService<AuditDatabaseContext>();
+        var primaryServices = scope.ServiceProvider
+            .GetRequiredService<IDatabaseContextServices<PrimaryDatabaseContext>>();
+        var auditServices = scope.ServiceProvider
+            .GetRequiredService<IDatabaseContextServices<AuditDatabaseContext>>();
+        var sqliteOptions = serviceProvider.GetRequiredService<IOptionsMonitor<SqliteOptions>>();
+
+        primary.Database.ProviderName.Should().Be("Microsoft.EntityFrameworkCore.Sqlite");
+        audit.Database.ProviderName.Should().Be("Microsoft.EntityFrameworkCore.Sqlite");
+        primary.Database.GetConnectionString().Should().Be("Data Source=shared.db");
+        audit.Database.GetConnectionString().Should().Be("Data Source=shared.db");
+        primaryServices.Options.RetryCount.Should().Be(9);
+        auditServices.Options.RetryCount.Should().Be(7);
+        primaryServices.Options.EnableSeed.Should().BeFalse();
+        auditServices.Options.EnableSeed.Should().BeTrue();
+        primaryServices.Options.UseQueryTrackingByDefault.Should().BeFalse();
+        sqliteOptions.Get(primaryBuilder.OptionsName).CommandTimeoutSeconds.Should().Be(13);
+        sqliteOptions.Get(auditBuilder.OptionsName).CommandTimeoutSeconds.Should().Be(30);
+        primary.GetService<IHistoryRepository>().GetCreateScript()
+            .Should().Contain("__PrimaryMigrationsHistory");
+        audit.GetService<IHistoryRepository>().GetCreateScript()
+            .Should().Contain("__AuditMigrationsHistory");
+        serviceProvider.GetServices<IDatabaseInitializer>().Should().HaveCount(2);
+        serviceProvider.GetRequiredService<IDatabaseInitializer<PrimaryDatabaseContext>>().Should().NotBeNull();
+        serviceProvider.GetRequiredService<IDatabaseInitializer<AuditDatabaseContext>>().Should().NotBeNull();
+        scope.ServiceProvider.GetServices<IRaycynixDatabaseContext>().Should().HaveCount(2);
+    }
+
     [DatabaseTable("external_configured_entities")]
     private sealed class ExternalConfiguredEntityConfigurator : GenericConfigurator<ExternalConfiguredEntity>
     {
@@ -384,6 +486,24 @@ public sealed class DatabaseRegistrationTests
     private sealed class ExternalConfiguredEntity
     {
         public int Id { get; init; }
+    }
+
+    private sealed class PrimaryDatabaseContext(
+        DbContextOptions<PrimaryDatabaseContext> options,
+        IDatabaseContextServices<PrimaryDatabaseContext> services) : DbContext(options), IRaycynixDatabaseContext
+    {
+        protected override void OnModelCreating(ModelBuilder modelBuilder) => services.ConfigureModel(modelBuilder);
+
+        public string GetModelCacheKey() => services.GetModelCacheKey();
+    }
+
+    private sealed class AuditDatabaseContext(
+        DbContextOptions<AuditDatabaseContext> options,
+        IDatabaseContextServices<AuditDatabaseContext> services) : DbContext(options), IRaycynixDatabaseContext
+    {
+        protected override void OnModelCreating(ModelBuilder modelBuilder) => services.ConfigureModel(modelBuilder);
+
+        public string GetModelCacheKey() => services.GetModelCacheKey();
     }
 
     private sealed class FakeLogger<T> : ILogger<T>

@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Raycynix.Extensions.Database.Abstractions;
 using Raycynix.Extensions.Database.Abstractions.Attributes;
@@ -24,6 +25,30 @@ namespace Raycynix.Extensions.Messaging.Database.Tests.Registration;
 /// </summary>
 public sealed class MessagingDatabaseRegistrationTests
 {
+    /// <summary>
+    /// Verifies that messaging startup initializes only the context used by its database stores.
+    /// </summary>
+    [Fact]
+    public async Task AddDatabasePersistence_Startup_ShouldInitializeOnlyMessagingDatabaseContext()
+    {
+        var services = new ServiceCollection();
+        var messagingInitializer = new RecordingMessagingDatabaseInitializer();
+        var unrelatedInitializer = new RecordingDatabaseInitializer();
+        services.AddSingleton<IDatabaseInitializer<RaycynixDatabaseContext>>(messagingInitializer);
+        services.AddSingleton<IDatabaseInitializer>(unrelatedInitializer);
+        services.AddRaycynixMessaging(BuildMessagingConfiguration())
+            .AddDatabasePersistence();
+
+        await using var provider = services.BuildServiceProvider(validateScopes: true);
+        var initializationService = provider.GetServices<IHostedService>()
+            .Single(service => service.GetType().Name == "MessagingDatabasePersistenceInitializationService");
+
+        await initializationService.StartAsync(TestContext.Current.CancellationToken);
+
+        messagingInitializer.CallCount.Should().Be(1);
+        unrelatedInitializer.CallCount.Should().Be(0);
+    }
+
     /// <summary>
     /// Verifies that database persistence options can be bound from configuration using the default section name.
     /// </summary>
@@ -737,6 +762,33 @@ public sealed class MessagingDatabaseRegistrationTests
         {
             PublishedMessageIds.Add(message.MessageId);
             return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingMessagingDatabaseInitializer
+        : IDatabaseInitializer<RaycynixDatabaseContext>
+    {
+        public int CallCount { get; private set; }
+
+        public bool IsReady => CallCount > 0;
+
+        public Task InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingDatabaseInitializer : IDatabaseInitializer
+    {
+        public int CallCount { get; private set; }
+
+        public bool IsReady => CallCount > 0;
+
+        public Task InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            return Task.CompletedTask;
         }
     }
 

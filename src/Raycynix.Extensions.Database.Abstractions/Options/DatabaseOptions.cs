@@ -21,6 +21,17 @@ public sealed class DatabaseOptions
     public bool UseMigrations { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets the migrations history table used by this context.
+    /// Set a distinct value for each context that manages the same physical database.
+    /// </summary>
+    public string? MigrationsHistoryTable { get; set; }
+
+    /// <summary>
+    /// Gets or sets the optional schema containing the migrations history table.
+    /// </summary>
+    public string? MigrationsHistorySchema { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether the database should be created when it does not exist.
     /// </summary>
     public bool EnsureCreated { get; set; } = true;
@@ -74,6 +85,26 @@ public sealed class DatabaseOptions
         {
             throw new InvalidOperationException(
                 "EnsureCreated and UseMigrations cannot both be enabled at the same time.");
+        }
+
+        if (MigrationsHistoryTable is not null && string.IsNullOrWhiteSpace(MigrationsHistoryTable))
+        {
+            throw new ArgumentException(
+                "Migrations history table cannot be empty or whitespace.",
+                nameof(MigrationsHistoryTable));
+        }
+
+        if (MigrationsHistorySchema is not null && string.IsNullOrWhiteSpace(MigrationsHistorySchema))
+        {
+            throw new ArgumentException(
+                "Migrations history schema cannot be empty or whitespace.",
+                nameof(MigrationsHistorySchema));
+        }
+
+        if (MigrationsHistorySchema is not null && MigrationsHistoryTable is null)
+        {
+            throw new InvalidOperationException(
+                "MigrationsHistoryTable must be configured when MigrationsHistorySchema is set.");
         }
 
         var hasConnectionString = !string.IsNullOrWhiteSpace(ConnectionString);

@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.1.0
+
+### Added
+
+- Added support for registering multiple independently configured Identity context types.
+- Added configuration-section overloads for Identity context registration.
+
+### Changed
+
+- Assemblies registered before an Identity context are now preserved when its isolated model registry is created.
+- Built-in Identity contexts now resolve context-specific `DbContextOptions<TContext>` when multiple variants are registered.
+
 ## 3.0.1
 
 ### Added

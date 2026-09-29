@@ -1,6 +1,17 @@
 # Changelog
 
-All published packages share version **3.0.1**, defined in [Directory.Build.props](Directory.Build.props).
+All published packages share version **3.1.0**, defined in [Directory.Build.props](Directory.Build.props).
+
+## 3.1.0
+
+### Added
+
+- Multiple Raycynix database contexts with shared database/provider settings, named context overrides, isolated models, typed initialization, and independent migrations history tables.
+
+### Changed
+
+- Host database initialization now initializes every registered context while preserving the existing single-context service surface.
+- Updated all database examples to use shared options with named context overrides.
 
 ## 3.0.1
 

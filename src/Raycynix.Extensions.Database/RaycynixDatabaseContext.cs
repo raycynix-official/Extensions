@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Raycynix.Extensions.Database.Abstractions;
-using Raycynix.Extensions.Database.Abstractions.Options;
-using Raycynix.Extensions.Database.Implementations;
 
 namespace Raycynix.Extensions.Database;
 
@@ -11,27 +8,19 @@ namespace Raycynix.Extensions.Database;
 /// </summary>
 public sealed class RaycynixDatabaseContext : DbContext, IRaycynixDatabaseContext
 {
-    private readonly DatabaseOptions _config;
-    private readonly IDatabaseModelConfigurator _modelConfigurator;
-    private readonly string _providerName;
+    private readonly IDatabaseContextServices<RaycynixDatabaseContext> _services;
 
     /// <summary>
     /// Initializes a new instance of <see cref="RaycynixDatabaseContext"/>.
     /// </summary>
     /// <param name="options">The EF Core options for the context.</param>
-    /// <param name="config">The database configuration.</param>
-    /// <param name="modelConfigurator">The model configurator used to apply registered entity configurators.</param>
-    /// <param name="serviceProvider">The service provider used to resolve database infrastructure services.</param>
+    /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixDatabaseContext(
-        DbContextOptions options,
-        DatabaseOptions config,
-        IDatabaseModelConfigurator modelConfigurator,
-        IServiceProvider serviceProvider)
+        DbContextOptions<RaycynixDatabaseContext> options,
+        IDatabaseContextServices<RaycynixDatabaseContext> services)
         : base(options)
     {
-        _config = config;
-        _modelConfigurator = modelConfigurator;
-        _providerName = serviceProvider.GetRequiredService<DatabaseProviderDescriptor>().ProviderName;
+        _services = services;
 
         ConfigureChangeTracker();
     }
@@ -43,14 +32,14 @@ public sealed class RaycynixDatabaseContext : DbContext, IRaycynixDatabaseContex
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        _modelConfigurator.Configure(builder, _providerName);
+        _services.ConfigureModel(builder);
     }
 
     private void ConfigureChangeTracker()
     {
-        ChangeTracker.LazyLoadingEnabled = _config.EnableLazyLoading;
-        ChangeTracker.AutoDetectChangesEnabled = _config.EnableAutoDetectChanges;
-        ChangeTracker.QueryTrackingBehavior = _config.UseQueryTrackingByDefault
+        ChangeTracker.LazyLoadingEnabled = _services.Options.EnableLazyLoading;
+        ChangeTracker.AutoDetectChangesEnabled = _services.Options.EnableAutoDetectChanges;
+        ChangeTracker.QueryTrackingBehavior = _services.Options.UseQueryTrackingByDefault
             ? QueryTrackingBehavior.TrackAll
             : QueryTrackingBehavior.NoTracking;
     }
@@ -58,6 +47,6 @@ public sealed class RaycynixDatabaseContext : DbContext, IRaycynixDatabaseContex
     /// <inheritdoc />
     public string GetModelCacheKey()
     {
-        return _modelConfigurator.GetModelCacheKey(_providerName);
+        return _services.GetModelCacheKey();
     }
 }

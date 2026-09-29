@@ -132,5 +132,41 @@ public sealed class DatabaseOptionsTests
         act.Should().NotThrow();
     }
 
+    /// <summary>
+    /// Verifies that a migrations history schema cannot be configured without a table name.
+    /// </summary>
+    [Fact]
+    public void Validate_ShouldFail_WhenMigrationsHistorySchemaHasNoTable()
+    {
+        var configuration = new DatabaseOptions
+        {
+            ConnectionString = "Data Source=test.db",
+            MigrationsHistorySchema = "application"
+        };
+
+        var act = configuration.Validate;
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*MigrationsHistoryTable must be configured*");
+    }
+
+    /// <summary>
+    /// Verifies that context-specific migrations history settings are accepted together.
+    /// </summary>
+    [Fact]
+    public void Validate_ShouldSucceed_WhenMigrationsHistoryTableAndSchemaAreConfigured()
+    {
+        var configuration = new DatabaseOptions
+        {
+            ConnectionString = "Host=localhost;Database=test",
+            MigrationsHistoryTable = "__ApplicationMigrationsHistory",
+            MigrationsHistorySchema = "application"
+        };
+
+        var act = configuration.Validate;
+
+        act.Should().NotThrow();
+    }
+
     private sealed class TestConnectionOptions : ConnectionOptions;
 }

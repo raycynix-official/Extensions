@@ -31,7 +31,7 @@ builder.Services
     .AddPostgreSql();
 ```
 
-Exactly one provider must be registered:
+Exactly one provider must be registered for each context:
 
 - `AddPostgreSql()`
 - `AddMsSql()`
@@ -97,22 +97,18 @@ Enable Debug logs when troubleshooting provider resolution, DbContext setup, mod
 ```csharp
 public sealed class AppDatabaseContext : DbContext, IRaycynixDatabaseContext
 {
-    private readonly IDatabaseModelConfigurator _modelConfigurator;
-    private readonly string _providerName;
+    private readonly IDatabaseContextServices<AppDatabaseContext> _services;
 
     public AppDatabaseContext(
-        DbContextOptions options,
-        DatabaseOptions config,
-        IDatabaseModelConfigurator modelConfigurator,
-        IServiceProvider serviceProvider)
+        DbContextOptions<AppDatabaseContext> options,
+        IDatabaseContextServices<AppDatabaseContext> services)
         : base(options)
     {
-        _modelConfigurator = modelConfigurator;
-        _providerName = serviceProvider.GetRequiredService<DatabaseProviderDescriptor>().ProviderName;
+        _services = services;
 
-        ChangeTracker.LazyLoadingEnabled = config.EnableLazyLoading;
-        ChangeTracker.AutoDetectChangesEnabled = config.EnableAutoDetectChanges;
-        ChangeTracker.QueryTrackingBehavior = config.UseQueryTrackingByDefault
+        ChangeTracker.LazyLoadingEnabled = services.Options.EnableLazyLoading;
+        ChangeTracker.AutoDetectChangesEnabled = services.Options.EnableAutoDetectChanges;
+        ChangeTracker.QueryTrackingBehavior = services.Options.UseQueryTrackingByDefault
             ? QueryTrackingBehavior.TrackAll
             : QueryTrackingBehavior.NoTracking;
     }
@@ -120,12 +116,12 @@ public sealed class AppDatabaseContext : DbContext, IRaycynixDatabaseContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        _modelConfigurator.Configure(builder, _providerName);
+        _services.ConfigureModel(builder);
     }
 
     public string GetModelCacheKey()
     {
-        return _modelConfigurator.GetModelCacheKey(_providerName);
+        return _services.GetModelCacheKey();
     }
 }
 
@@ -133,6 +129,64 @@ builder.Services
     .AddRaycynixDatabase<AppDatabaseContext>(builder.Configuration)
     .AddPostgreSql();
 ```
+
+## Multiple Contexts
+
+Pass a context name to layer `DatabaseOptions:Contexts:<name>` over the shared `DatabaseOptions`.
+The shared connection and provider settings can therefore be reused by contexts that access the
+same database, while context behavior, migrations history, model assemblies, model cache keys,
+and initialization remain isolated.
+
+```csharp
+builder.Services
+    .AddRaycynixDatabase<AppDatabaseContext>(builder.Configuration, "Application")
+    .AddPostgreSql()
+    .AddAssembly<AppModelMarker>();
+
+builder.Services
+    .AddRaycynixDatabase<AuditDatabaseContext>(builder.Configuration, "Audit")
+    .AddPostgreSql()
+    .AddAssembly<AuditModelMarker>();
+```
+
+```json
+{
+  "DatabaseOptions": {
+    "ConnectionString": "Host=localhost;Database=app;Username=app;Password=secret",
+    "RetryCount": 5,
+    "PostgreSqlOptions": {
+      "Pooling": true,
+      "MaximumPoolSize": 100
+    },
+    "Contexts": {
+      "Application": {
+        "UseMigrations": true,
+        "EnsureCreated": false,
+        "MigrationsHistoryTable": "__ApplicationMigrationsHistory",
+        "MigrationsHistorySchema": "application"
+      },
+      "Audit": {
+        "UseMigrations": true,
+        "EnsureCreated": false,
+        "EnableSeed": false,
+        "MigrationsHistoryTable": "__AuditMigrationsHistory",
+        "MigrationsHistorySchema": "audit"
+      }
+    }
+  }
+}
+```
+
+Configuration is applied in this order: shared database settings, shared provider settings,
+context overrides, context provider overrides, and finally registration callbacks. A context can
+override `ConnectionString` as well, so the same API also supports contexts on separate databases.
+
+Use migrations rather than `EnsureCreated` when several contexts manage one physical database.
+Each context should have a distinct migrations history table.
+
+Custom contexts should inject `IDatabaseContextServices<TContext>` as shown above. Calling
+`InitializeRaycynixDatabaseAsync()` initializes every registered context. Resolve
+`IDatabaseInitializer<TContext>` when only one context should be initialized.
 
 ## Assembly Registration
 

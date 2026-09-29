@@ -8,7 +8,9 @@ Contracts and configuration models shared by the Raycynix database packages.
 
 - `DatabaseOptions` and `ConnectionOptions`
 - `IDatabaseBuilder`
+- `IDatabaseContextServices<TContext>` for context-isolated options and model configuration
 - `IDatabaseInitializer`
+- `IDatabaseInitializer<TContext>` for initializing one selected context
 - `IDatabaseProviderRegistration`
 - `IDatabaseProviderModelConfigurator`
 - `IDatabaseModelAssemblyRegistry`

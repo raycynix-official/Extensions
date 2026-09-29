@@ -11,8 +11,30 @@ namespace Raycynix.Extensions.Database;
 public class DatabaseBuilder(
     IServiceCollection services,
     IConfiguration configuration,
-    Assembly registrationAssembly) : IDatabaseBuilder
+    Assembly registrationAssembly,
+    Type contextType,
+    string optionsName,
+    string configurationSectionName,
+    string? contextName) : IDatabaseBuilder
 {
+    /// <inheritdoc />
+    public Type ContextType { get; } = contextType ?? throw new ArgumentNullException(nameof(contextType));
+
+    /// <inheritdoc />
+    public string OptionsName { get; } = optionsName ?? throw new ArgumentNullException(nameof(optionsName));
+
+    /// <inheritdoc />
+    public string ConfigurationSectionName { get; } = configurationSectionName ??
+                                                      throw new ArgumentNullException(nameof(configurationSectionName));
+
+    /// <inheritdoc />
+    public string? ContextName { get; } = contextName;
+
+    /// <inheritdoc />
+    public string? ContextConfigurationSectionName { get; } = contextName is null
+        ? null
+        : $"{configurationSectionName}:Contexts:{contextName}";
+
     /// <inheritdoc />
     public IServiceCollection Services { get; } = services ?? throw new ArgumentNullException(nameof(services));
 

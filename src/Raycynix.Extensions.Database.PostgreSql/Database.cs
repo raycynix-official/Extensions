@@ -1,5 +1,8 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Raycynix.Extensions.Configuration;
 using Raycynix.Extensions.Configuration.Abstractions.Interfaces;
 using Raycynix.Extensions.Database.Abstractions;
@@ -26,19 +29,46 @@ public static class Database
     {
         ArgumentNullException.ThrowIfNull(builder);
 
+        var optionsName = builder.OptionsName;
         builder.Services.AddRaycynixConfiguration<PostgreSqlOptions>(
             builder.Configuration,
-            $"{nameof(DatabaseOptions)}:{nameof(PostgreSqlOptions)}",
-            configurePostBind: configure);
+            $"{builder.ConfigurationSectionName}:{nameof(PostgreSqlOptions)}",
+            optionsName: optionsName,
+            configurePostBind: builder.ContextName is null ? configure : null);
+        if (builder.ContextConfigurationSectionName is { } contextSectionName)
+        {
+            builder.Services.AddOptions<PostgreSqlOptions>(optionsName)
+                .Bind(builder.Configuration.GetSection($"{contextSectionName}:{nameof(PostgreSqlOptions)}"))
+                .PostConfigure(options => configure?.Invoke(options));
+        }
+
         builder.Services.AddRaycynixConfigurationValidator<PostgreSqlOptions, PostgreSqlOptionsValidator>();
-
         builder.Services.TryAddSingleton(serviceProvider =>
-            serviceProvider.GetRequiredService<IConfigurationAccessor<PostgreSqlOptions>>().Current);
+            serviceProvider.GetRequiredService<IOptionsMonitor<PostgreSqlOptions>>().Get(optionsName)
+        );
 
-        builder.Services.TryAddEnumerable(
-            ServiceDescriptor.Singleton<IDatabaseProviderRegistration, PostgreSqlDatabaseProviderRegistration>());
-        builder.Services.TryAddEnumerable(
-            ServiceDescriptor.Singleton<IDatabaseProviderModelConfigurator, PostgreSqlProviderModelConfigurator>());
+        builder.Services.AddKeyedSingleton<IDatabaseProviderRegistration>(
+            builder.ContextType, (serviceProvider, _) =>
+                new PostgreSqlDatabaseProviderRegistration(
+                    serviceProvider.GetRequiredService<IOptionsMonitor<PostgreSqlOptions>>().Get(optionsName),
+                    serviceProvider.GetService<ILogger<PostgreSqlDatabaseProviderRegistration>>()
+                )
+        );
+
+        builder.Services.AddKeyedSingleton<IDatabaseProviderModelConfigurator>(
+            builder.ContextType, (serviceProvider, _) =>
+                new PostgreSqlProviderModelConfigurator(
+                    serviceProvider.GetRequiredService<IOptionsMonitor<PostgreSqlOptions>>().Get(optionsName)
+                )
+        );
+
+        if (optionsName == Microsoft.Extensions.Options.Options.DefaultName)
+        {
+            builder.Services.AddSingleton<IDatabaseProviderRegistration>(serviceProvider =>
+                serviceProvider.GetRequiredKeyedService<IDatabaseProviderRegistration>(builder.ContextType));
+            builder.Services.AddSingleton<IDatabaseProviderModelConfigurator>(serviceProvider =>
+                serviceProvider.GetRequiredKeyedService<IDatabaseProviderModelConfigurator>(builder.ContextType));
+        }
 
         return builder;
     }

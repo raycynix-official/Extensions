@@ -14,13 +14,8 @@ builder.AddRaycynixSerilog(options =>
 });
 
 builder.Services
-    .AddRaycynixIdentityDatabase(builder.Configuration, options =>
-    {
-        options.EnsureCreated = true;
-        options.UseMigrations = false;
-        options.EnableSeed = true;
-    })
-    .AddSqlite(sqlite => { sqlite.CommandTimeoutSeconds = 30; });
+    .AddRaycynixIdentityDatabase(builder.Configuration, "Identity")
+    .AddSqlite();
 
 var app = builder.Build();
 

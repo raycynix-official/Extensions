@@ -27,7 +27,7 @@ internal sealed class DatabaseObservability : IDatabaseObservability
         if (serviceProvider.GetService(typeof(IMeterFactory)) is not IMeterFactory meterFactory)
         {
             _logger?.LogDebug(
-                "Database observability initialized without metrics service.");
+                "Database observability initialized without metrics service");
             return;
         }
 
@@ -43,7 +43,7 @@ internal sealed class DatabaseObservability : IDatabaseObservability
             description: "Duration of observed database operations.");
 
         _logger?.LogDebug(
-            "Database observability initialized. Metrics enabled: {MetricsEnabled}.",
+            "Database observability initialized. Metrics enabled: {MetricsEnabled}",
             true);
     }
 
@@ -57,16 +57,19 @@ internal sealed class DatabaseObservability : IDatabaseObservability
     {
         providerName = providerName.ToLowerInvariant();
         _logger?.LogDebug(
-            "Beginning observed database operation {Operation} for provider {ProviderName}.",
+            "Beginning observed database operation {Operation} for provider {ProviderName}",
             operation,
             providerName);
 
         var timer = _operationDuration?.MeasureDuration(
             new("raycynix.database.provider", providerName),
-            new("raycynix.database.operation", operation)) ?? NoopDisposable.Instance;
+            new("raycynix.database.operation", operation)
+        ) ?? NoopDisposable.Instance;
+
         var activity = RaycynixTracing.ActivitySource.StartActivity($"database.{operation}", ActivityKind.Client);
         activity?.SetTag("raycynix.database.provider", providerName);
         activity?.SetTag("raycynix.database.operation", operation);
+
         var trace = (IDisposable?)activity ?? NoopDisposable.Instance;
 
         return new CompositeDisposable(timer, trace);
@@ -115,7 +118,7 @@ internal sealed class DatabaseObservability : IDatabaseObservability
             new("raycynix.database.status", status));
 
         _logger?.LogDebug(
-            "Recorded database operation {Operation} for provider {ProviderName} with status {Status}.",
+            "Recorded database operation {Operation} for provider {ProviderName} with status {Status}",
             operation,
             providerName,
             status);
@@ -129,5 +132,4 @@ internal sealed class DatabaseObservability : IDatabaseObservability
             first.Dispose();
         }
     }
-
 }

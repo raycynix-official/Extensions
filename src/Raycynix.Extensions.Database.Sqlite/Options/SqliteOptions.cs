@@ -31,9 +31,7 @@ public sealed class SqliteOptions
         ValidateEnum<SqliteCacheMode>(Cache, nameof(Cache));
 
         if (CommandTimeoutSeconds < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(CommandTimeoutSeconds), "Command timeout cannot be negative.");
-        }
+            throw new ArgumentOutOfRangeException(nameof(CommandTimeoutSeconds), "Command timeout cannot be negative");
     }
 
     private static void ValidateEnum<TEnum>(string? value, string propertyName)
@@ -42,7 +40,7 @@ public sealed class SqliteOptions
         if (!string.IsNullOrWhiteSpace(value) &&
             (!Enum.TryParse<TEnum>(value, ignoreCase: true, out var parsed) || !Enum.IsDefined(parsed)))
         {
-            throw new InvalidOperationException($"{propertyName} contains unsupported value '{value}'.");
+            throw new InvalidOperationException($"{propertyName} contains unsupported value '{value}'");
         }
     }
 }

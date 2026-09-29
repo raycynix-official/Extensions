@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0
+
+### Changed
+
+- SQL Server provider settings and model defaults are now isolated per registered context.
+- Context-specific migrations history table and schema settings are applied to EF Core.
+
 ## 3.0.1
 
 ### Added

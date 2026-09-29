@@ -17,3 +17,10 @@ public interface IDatabaseInitializer
     /// </summary>
     bool IsReady { get; }
 }
+
+/// <summary>
+/// Defines database initialization for one concrete context type.
+/// </summary>
+/// <typeparam name="TContext">The context to initialize.</typeparam>
+public interface IDatabaseInitializer<TContext> : IDatabaseInitializer
+    where TContext : Microsoft.EntityFrameworkCore.DbContext, IRaycynixDatabaseContext;

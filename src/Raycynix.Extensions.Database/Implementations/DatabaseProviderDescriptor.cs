@@ -23,16 +23,19 @@ public sealed class DatabaseProviderDescriptor
     /// Resolves the single active database provider registration from the service provider.
     /// </summary>
     /// <param name="serviceProvider">The service provider containing database provider registrations.</param>
+    /// <param name="serviceKey">The optional context key used to select provider registrations.</param>
     /// <returns>A descriptor for the active database provider.</returns>
     /// <exception cref="NotSupportedException">Thrown when no database provider is registered.</exception>
     /// <exception cref="InvalidOperationException">Thrown when more than one database provider is registered.</exception>
-    public static DatabaseProviderDescriptor Resolve(IServiceProvider serviceProvider)
+    public static DatabaseProviderDescriptor Resolve(IServiceProvider serviceProvider, object? serviceKey = null)
     {
         var logger = serviceProvider.GetService<ILogger<DatabaseProviderDescriptor>>();
-        var registrations = serviceProvider.GetServices<IDatabaseProviderRegistration>().ToArray();
+        var registrations = serviceKey is null
+            ? serviceProvider.GetServices<IDatabaseProviderRegistration>().ToArray()
+            : serviceProvider.GetKeyedServices<IDatabaseProviderRegistration>(serviceKey).ToArray();
 
         logger?.LogDebug(
-            "Resolving database provider. Registered provider count: {ProviderCount}.",
+            "Resolving database provider. Registered provider count: {ProviderCount}",
             registrations.Length);
 
         return registrations.Length switch
@@ -50,13 +53,13 @@ public sealed class DatabaseProviderDescriptor
         ILogger<DatabaseProviderDescriptor>? logger)
     {
         logger?.LogDebug(
-            "Resolved active database provider {ProviderName}.",
+            "Resolved active database provider {ProviderName}",
             registration.ProviderName);
 
         return new DatabaseProviderDescriptor
-            {
-                ProviderName = registration.ProviderName,
-                Registration = registration
+        {
+            ProviderName = registration.ProviderName,
+            Registration = registration
         };
     }
 }

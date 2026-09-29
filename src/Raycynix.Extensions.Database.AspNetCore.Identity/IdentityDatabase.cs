@@ -28,10 +28,12 @@ public static class IdentityDatabase
         /// <typeparam name="TMigrationMarker">A marker type from the assembly that contains EF Core migrations.</typeparam>
         /// <param name="configuration">The application configuration used to bind <see cref="DatabaseOptions"/>.</param>
         /// <param name="setup">An optional callback for adjusting the bound database configuration.</param>
+        /// <param name="contextName">An optional name under <c>DatabaseOptions:Contexts</c>.</param>
         /// <returns>A builder that can be used to extend the database registration.</returns>
         public IDatabaseBuilder AddRaycynixIdentityDatabase<TContext, TMarker, TMigrationMarker>(
             IConfiguration configuration,
-            Action<DatabaseOptions>? setup = null)
+            Action<DatabaseOptions>? setup = null,
+            string? contextName = null)
             where TContext : DbContext, IRaycynixIdentityDatabaseContext
         {
             var migrationsAssembly = typeof(TMigrationMarker).Assembly;
@@ -42,7 +44,8 @@ public static class IdentityDatabase
                 configuration,
                 migrationsAssembly,
                 setup,
-                modelAssembly);
+                modelAssembly,
+                contextName: contextName);
         }
 
         /// <summary>
@@ -53,10 +56,12 @@ public static class IdentityDatabase
         /// <typeparam name="TMarker">A marker type from the assembly to register for configurators and migrations.</typeparam>
         /// <param name="configuration">The application configuration used to bind <see cref="DatabaseOptions"/>.</param>
         /// <param name="setup">An optional callback for adjusting the bound database configuration.</param>
+        /// <param name="contextName">An optional name under <c>DatabaseOptions:Contexts</c>.</param>
         /// <returns>A builder that can be used to extend the database registration.</returns>
         public IDatabaseBuilder AddRaycynixIdentityDatabase<TContext, TMarker>(
             IConfiguration configuration,
-            Action<DatabaseOptions>? setup = null)
+            Action<DatabaseOptions>? setup = null,
+            string? contextName = null)
             where TContext : DbContext, IRaycynixIdentityDatabaseContext
         {
             var assembly = typeof(TMarker).Assembly;
@@ -66,7 +71,8 @@ public static class IdentityDatabase
                 configuration,
                 assembly,
                 setup,
-                assembly);
+                assembly,
+                contextName: contextName);
         }
 
         /// <summary>
@@ -77,12 +83,14 @@ public static class IdentityDatabase
         /// <param name="migrationsAssembly">The assembly that contains EF Core migrations.</param>
         /// <param name="modelAssembly">The assembly that contributes EF Core configurators.</param>
         /// <param name="setup">An optional callback for adjusting the bound database configuration.</param>
+        /// <param name="contextName">An optional name under <c>DatabaseOptions:Contexts</c>.</param>
         /// <returns>A builder that can be used to extend the database registration.</returns>
         public IDatabaseBuilder AddRaycynixIdentityDatabase<TContext>(
             IConfiguration configuration,
             Assembly migrationsAssembly,
             Assembly modelAssembly,
-            Action<DatabaseOptions>? setup = null)
+            Action<DatabaseOptions>? setup = null,
+            string? contextName = null)
             where TContext : DbContext, IRaycynixIdentityDatabaseContext
         {
             ArgumentNullException.ThrowIfNull(migrationsAssembly);
@@ -93,7 +101,8 @@ public static class IdentityDatabase
                 configuration,
                 migrationsAssembly,
                 setup,
-                modelAssembly);
+                modelAssembly,
+                contextName: contextName);
         }
 
         /// <summary>
@@ -104,11 +113,13 @@ public static class IdentityDatabase
         /// <param name="configuration">The application configuration used to bind <see cref="DatabaseOptions"/>.</param>
         /// <param name="assembly">The assembly to register for configurators and migrations.</param>
         /// <param name="setup">An optional callback for adjusting the bound database configuration.</param>
+        /// <param name="contextName">An optional name under <c>DatabaseOptions:Contexts</c>.</param>
         /// <returns>A builder that can be used to extend the database registration.</returns>
         public IDatabaseBuilder AddRaycynixIdentityDatabase<TContext>(
             IConfiguration configuration,
             Assembly assembly,
-            Action<DatabaseOptions>? setup = null)
+            Action<DatabaseOptions>? setup = null,
+            string? contextName = null)
             where TContext : DbContext, IRaycynixIdentityDatabaseContext
         {
             ArgumentNullException.ThrowIfNull(assembly);
@@ -118,7 +129,8 @@ public static class IdentityDatabase
                 configuration,
                 assembly,
                 setup,
-                assembly);
+                assembly,
+                contextName: contextName);
         }
 
         /// <summary>
@@ -151,6 +163,31 @@ public static class IdentityDatabase
         }
 
         /// <summary>
+        /// Registers an Identity context using its own configuration section.
+        /// </summary>
+        public IDatabaseBuilder AddRaycynixIdentityDatabase<TContext>(
+            IConfiguration configuration,
+            string contextName,
+            Action<DatabaseOptions>? setup = null,
+            bool registerCallerAssembly = true)
+            where TContext : DbContext, IRaycynixIdentityDatabaseContext
+        {
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentException.ThrowIfNullOrWhiteSpace(contextName);
+
+            var callerAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
+            return DatabaseRegistrationExtensions.RegisterRaycynixDatabaseCore<TContext>(
+                services,
+                configuration,
+                callerAssembly,
+                setup,
+                registerCallerAssembly ? callerAssembly : null,
+                nameof(DatabaseOptions),
+                contextName);
+        }
+
+        /// <summary>
         /// Registers the Raycynix database infrastructure using the default <see cref="RaycynixIdentityDatabaseContext"/>.
         /// </summary>
         /// <param name="configuration">The application configuration used to bind <see cref="DatabaseOptions"/>.</param>
@@ -171,6 +208,28 @@ public static class IdentityDatabase
         }
 
         /// <summary>
+        /// Registers the default Identity context with overrides from
+        /// <c>DatabaseOptions:Contexts:&lt;contextName&gt;</c>.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="contextName">The logical context name.</param>
+        /// <param name="setup">An optional final configuration callback.</param>
+        /// <param name="registerCallerAssembly">Whether to scan the application assembly for configurators.</param>
+        /// <returns>A builder scoped to the default Identity context.</returns>
+        public IDatabaseBuilder AddRaycynixIdentityDatabase(
+            IConfiguration configuration,
+            string contextName,
+            Action<DatabaseOptions>? setup = null,
+            bool registerCallerAssembly = true)
+        {
+            return services.AddRaycynixIdentityDatabase<RaycynixIdentityDatabaseContext>(
+                configuration,
+                contextName,
+                setup,
+                registerCallerAssembly);
+        }
+
+        /// <summary>
         /// Registers an additional assembly that contributes EF Core configurators to the shared database context.
         /// </summary>
         /// <param name="assembly">The assembly to register.</param>
@@ -180,8 +239,23 @@ public static class IdentityDatabase
             ArgumentNullException.ThrowIfNull(services);
             ArgumentNullException.ThrowIfNull(assembly);
 
-            var modelAssemblyRegistry = DatabaseModelAssemblyRegistry.GetOrCreate(services);
-            modelAssemblyRegistry.Add(assembly);
+            var pendingRegistry = DatabaseModelAssemblyRegistry.GetOrCreate(services);
+            pendingRegistry.Add(assembly);
+
+            var contextRegistries = services
+                .Where(static descriptor => descriptor.ServiceType == typeof(IDatabaseModelAssemblyRegistry))
+                .Select(static descriptor => descriptor.IsKeyedService
+                    ? descriptor.KeyedImplementationInstance
+                    : descriptor.ImplementationInstance)
+                .OfType<DatabaseModelAssemblyRegistry>()
+                .Distinct()
+                .ToArray();
+
+            foreach (var registry in contextRegistries)
+            {
+                registry.Add(assembly);
+            }
+
             return services;
         }
 

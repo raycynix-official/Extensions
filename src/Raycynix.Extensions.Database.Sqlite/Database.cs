@@ -1,5 +1,8 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Raycynix.Extensions.Configuration;
 using Raycynix.Extensions.Configuration.Abstractions.Interfaces;
 using Raycynix.Extensions.Database.Abstractions;
@@ -26,17 +29,36 @@ public static class Database
     {
         ArgumentNullException.ThrowIfNull(builder);
 
+        var optionsName = builder.OptionsName;
         builder.Services.AddRaycynixConfiguration<SqliteOptions>(
             builder.Configuration,
-            $"{nameof(DatabaseOptions)}:{nameof(SqliteOptions)}",
-            configurePostBind: configure);
+            $"{builder.ConfigurationSectionName}:{nameof(SqliteOptions)}",
+            optionsName: optionsName,
+            configurePostBind: builder.ContextName is null ? configure : null);
+        if (builder.ContextConfigurationSectionName is { } contextSectionName)
+        {
+            builder.Services.AddOptions<SqliteOptions>(optionsName)
+                .Bind(builder.Configuration.GetSection($"{contextSectionName}:{nameof(SqliteOptions)}"))
+                .PostConfigure(options => configure?.Invoke(options));
+        }
+
         builder.Services.AddRaycynixConfigurationValidator<SqliteOptions, SqliteOptionsValidator>();
-
         builder.Services.TryAddSingleton(serviceProvider =>
-            serviceProvider.GetRequiredService<IConfigurationAccessor<SqliteOptions>>().Current);
+            serviceProvider.GetRequiredService<IOptionsMonitor<SqliteOptions>>().Get(optionsName)
+        );
 
-        builder.Services.TryAddEnumerable(ServiceDescriptor
-            .Singleton<IDatabaseProviderRegistration, SqliteDatabaseProviderRegistration>());
+        builder.Services.AddKeyedSingleton<IDatabaseProviderRegistration>(
+            builder.ContextType, (serviceProvider, _) =>
+                new SqliteDatabaseProviderRegistration(
+                    serviceProvider.GetRequiredService<IOptionsMonitor<SqliteOptions>>().Get(optionsName),
+                    serviceProvider.GetService<ILogger<SqliteDatabaseProviderRegistration>>()
+                )
+        );
+        if (optionsName == Microsoft.Extensions.Options.Options.DefaultName)
+        {
+            builder.Services.AddSingleton<IDatabaseProviderRegistration>(serviceProvider =>
+                serviceProvider.GetRequiredKeyedService<IDatabaseProviderRegistration>(builder.ContextType));
+        }
 
         return builder;
     }

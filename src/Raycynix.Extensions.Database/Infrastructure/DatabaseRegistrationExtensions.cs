@@ -5,8 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Raycynix.Extensions.Configuration;
-using Raycynix.Extensions.Configuration.Abstractions.Interfaces;
 using Raycynix.Extensions.Database.Abstractions;
 using Raycynix.Extensions.Database.Abstractions.Options;
 using Raycynix.Extensions.Database.Implementations;
@@ -28,72 +28,133 @@ public class DatabaseRegistrationExtensions
     /// <param name="migrationsAssembly">The assembly that contains EF Core migrations.</param>
     /// <param name="setup">An optional callback for adjusting the bound database configuration.</param>
     /// <param name="modelAssembly">An optional assembly that contributes EF Core model configurators.</param>
+    /// <param name="sectionName">The shared database configuration section.</param>
+    /// <param name="contextName">An optional name under the shared section's <c>Contexts</c> child.</param>
     /// <returns>A database builder for provider and feature registration.</returns>
     public static IDatabaseBuilder RegisterRaycynixDatabaseCore<TContext>(
         IServiceCollection services,
         IConfiguration configuration,
         Assembly migrationsAssembly,
         Action<DatabaseOptions>? setup,
-        Assembly? modelAssembly)
+        Assembly? modelAssembly,
+        string sectionName = nameof(DatabaseOptions),
+        string? contextName = null)
         where TContext : DbContext, IRaycynixDatabaseContext
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(migrationsAssembly);
 
-        EnsureContextRegistrationIsCompatible<TContext>(services);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sectionName);
+        if (contextName is not null)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(contextName);
+        }
 
-        var modelAssemblyRegistry = DatabaseModelAssemblyRegistry.GetOrCreate(services);
+        var hasRegisteredContext = services.Any(static service =>
+            service.ServiceType.IsGenericType &&
+            service.ServiceType.GetGenericTypeDefinition() == typeof(DatabaseContextDescriptor<>));
+        var newOptionsName = hasRegisteredContext
+            ? typeof(TContext).AssemblyQualifiedName!
+            : Options.DefaultName;
+        var descriptorType = typeof(DatabaseContextDescriptor<TContext>);
+        var existingDescriptor = services.FirstOrDefault(service => service.ServiceType == descriptorType)
+            ?.ImplementationInstance as DatabaseContextDescriptor<TContext>;
+        var optionsName = existingDescriptor?.OptionsName ?? newOptionsName;
+        var modelAssemblyRegistry = existingDescriptor is null
+            ? DatabaseModelAssemblyRegistry.GetOrCreate(services, typeof(TContext))
+            : existingDescriptor.ModelAssemblyRegistry;
         if (modelAssembly is not null)
         {
             modelAssemblyRegistry.Add(modelAssembly);
         }
 
-        if (IsContextRegistered<TContext>(services))
+        if (existingDescriptor is not null)
         {
             if (setup is not null)
             {
                 throw new InvalidOperationException(
-                    "Raycynix database is already registered. Configure DatabaseOptions only on the first AddRaycynixDatabase call.");
+                    "Raycynix database is already registered. Configure DatabaseOptions only on the first AddRaycynixDatabase call");
             }
 
-            return new DatabaseBuilder(services, configuration, migrationsAssembly);
+            return new DatabaseBuilder(
+                services,
+                configuration,
+                migrationsAssembly,
+                typeof(TContext),
+                optionsName,
+                existingDescriptor.ConfigurationSectionName,
+                existingDescriptor.ContextName);
         }
 
         services.AddRaycynixConfiguration<DatabaseOptions>(
             configuration,
-            configurePostBind: setup);
+            sectionName: sectionName,
+            optionsName: optionsName,
+            configurePostBind: contextName is null ? setup : null);
+        if (contextName is not null)
+        {
+            services.AddOptions<DatabaseOptions>(optionsName)
+                .Bind(configuration.GetSection($"{sectionName}:Contexts:{contextName}"))
+                .PostConfigure(options => setup?.Invoke(options));
+        }
 
         services.AddRaycynixConfigurationValidator<DatabaseOptions, DatabaseOptionsValidator>();
-        services.TryAddSingleton(serviceProvider =>
-            serviceProvider.GetRequiredService<IConfigurationAccessor<DatabaseOptions>>().Current);
-
-        services.TryAddSingleton<IDatabaseModelAssemblyRegistry>(modelAssemblyRegistry);
-        services.TryAddSingleton(static serviceProvider =>
-            DatabaseProviderDescriptor.Resolve(serviceProvider));
-
-        services.TryAddScoped<IDatabaseModelConfigurator, DatabaseModelConfigurator>();
         services.TryAddSingleton<IDatabaseObservability, NoOpDatabaseObservability>();
-        services.TryAddSingleton<IDatabaseInitializer, DatabaseInitializer<TContext>>();
+        var contextDescriptor = new DatabaseContextDescriptor<TContext>
+        {
+            ContextType = typeof(TContext),
+            OptionsName = optionsName,
+            ConfigurationSectionName = sectionName,
+            ContextName = contextName,
+            ModelAssemblyRegistry = modelAssemblyRegistry
+        };
+        services.AddSingleton(contextDescriptor);
+        services.AddScoped<IDatabaseContextServices<TContext>, DatabaseContextServices<TContext>>();
+        services.AddKeyedScoped<IDatabaseModelConfigurator>(typeof(TContext), (serviceProvider, _) =>
+        {
+            var config = serviceProvider.GetRequiredService<IOptionsMonitor<DatabaseOptions>>().Get(optionsName);
+            return new DatabaseModelConfigurator(
+                config,
+                modelAssemblyRegistry,
+                serviceProvider.GetRequiredService<IDatabaseObservability>(),
+                serviceProvider,
+                serviceProvider.GetKeyedServices<IDatabaseProviderModelConfigurator>(typeof(TContext)),
+                serviceProvider.GetService<ILogger<DatabaseModelConfigurator>>());
+        });
+
+        services.AddSingleton<IDatabaseInitializer<TContext>>(serviceProvider =>
+        {
+            var config = serviceProvider.GetRequiredService<IOptionsMonitor<DatabaseOptions>>().Get(optionsName);
+            var provider = DatabaseProviderDescriptor.Resolve(serviceProvider, typeof(TContext));
+            return new DatabaseInitializer<TContext>(
+                serviceProvider.GetRequiredService<IServiceScopeFactory>(),
+                serviceProvider.GetRequiredService<IDatabaseObservability>(),
+                config,
+                provider,
+                serviceProvider.GetService<ILogger<DatabaseInitializer<TContext>>>());
+        });
+        services.AddSingleton<IDatabaseInitializer>(serviceProvider =>
+            serviceProvider.GetRequiredService<IDatabaseInitializer<TContext>>());
 
         if (services.All(static descriptor => descriptor.ServiceType != typeof(TContext)))
         {
             services.AddDbContext<TContext>((serviceProvider, options) =>
             {
                 var logger = serviceProvider.GetService<ILogger<TContext>>();
-                var config = serviceProvider.GetRequiredService<DatabaseOptions>();
-                var providerDescriptor = serviceProvider.GetRequiredService<DatabaseProviderDescriptor>();
+                var config = serviceProvider.GetRequiredService<IOptionsMonitor<DatabaseOptions>>().Get(optionsName);
+                var providerDescriptor = DatabaseProviderDescriptor.Resolve(serviceProvider, typeof(TContext));
                 var providerRegistration = providerDescriptor.Registration;
 
                 logger?.LogDebug(
-                    "Configuring DbContext {DbContextType} with database provider {ProviderName}. Migrations assembly: {MigrationsAssembly}.",
+                    "Configuring DbContext {DbContextType} with database provider {ProviderName}. Migrations assembly: {MigrationsAssembly}",
                     typeof(TContext).Name,
                     providerDescriptor.ProviderName,
                     migrationsAssembly.GetName().Name);
 
                 providerRegistration.Validate(config);
                 logger?.LogDebug(
-                    "Database configuration validated for DbContext {DbContextType} with provider {ProviderName}.",
+                    "Database configuration validated for DbContext {DbContextType} with provider {ProviderName}",
                     typeof(TContext).Name,
                     providerDescriptor.ProviderName);
 
@@ -102,49 +163,28 @@ public class DatabaseRegistrationExtensions
                 providerRegistration.Configure(options, connectionString, config, migrationsAssembly, serviceProvider);
 
                 logger?.LogDebug(
-                    "DbContext {DbContextType} configured with database provider {ProviderName}.",
+                    "DbContext {DbContextType} configured with database provider {ProviderName}",
                     typeof(TContext).Name,
                     providerDescriptor.ProviderName);
             });
         }
 
-        services.TryAddScoped<IRaycynixDatabaseContext>(provider =>
+        services.AddScoped<IRaycynixDatabaseContext>(provider =>
             provider.GetRequiredService<TContext>());
 
-        services.TryAddSingleton(new DatabaseContextDescriptor
+        // Keep the original unkeyed services available for existing single-context consumers.
+        if (services.Count(service => service.ServiceType == typeof(IRaycynixDatabaseContext)) == 1)
         {
-            ContextType = typeof(TContext)
-        });
-
-        return new DatabaseBuilder(services, configuration, migrationsAssembly);
-    }
-
-    private static void EnsureContextRegistrationIsCompatible<TContext>(IServiceCollection services)
-        where TContext : IRaycynixDatabaseContext
-    {
-        var registeredContextType = GetRegisteredContextType(services);
-        if (registeredContextType is null || registeredContextType == typeof(TContext))
-        {
-            return;
+            services.TryAddSingleton(serviceProvider =>
+                serviceProvider.GetRequiredService<IOptionsMonitor<DatabaseOptions>>().Get(optionsName));
+            services.TryAddSingleton<IDatabaseModelAssemblyRegistry>(modelAssemblyRegistry);
+            services.TryAddScoped<IDatabaseModelConfigurator>(serviceProvider =>
+                serviceProvider.GetRequiredKeyedService<IDatabaseModelConfigurator>(typeof(TContext)));
+            services.TryAddSingleton(serviceProvider =>
+                DatabaseProviderDescriptor.Resolve(serviceProvider, typeof(TContext)));
         }
 
-        throw new InvalidOperationException(
-            $"Raycynix database is already registered with context type {registeredContextType.FullName}. " +
-            $"It cannot be registered again with context type {typeof(TContext).FullName}.");
-    }
-
-    private static bool IsContextRegistered<TContext>(IServiceCollection services)
-        where TContext : IRaycynixDatabaseContext
-    {
-        return GetRegisteredContextType(services) == typeof(TContext);
-    }
-
-    private static Type? GetRegisteredContextType(IServiceCollection services)
-    {
-        return services
-            .FirstOrDefault(static descriptor => descriptor.ServiceType == typeof(DatabaseContextDescriptor))
-            ?.ImplementationInstance is DatabaseContextDescriptor descriptor
-            ? descriptor.ContextType
-            : null;
+        return new DatabaseBuilder(
+            services, configuration, migrationsAssembly, typeof(TContext), optionsName, sectionName, contextName);
     }
 }

@@ -150,23 +150,39 @@ public sealed class IdentityDatabaseRegistrationTests
     }
 
     /// <summary>
-    /// Verifies that a different context type cannot be registered after the initial database registration.
+    /// Verifies that different Identity context types can be registered independently.
     /// </summary>
     [Fact]
-    public void AddRaycynixIdentityDatabase_ShouldFail_WhenDifferentContextIsRegisteredAgain()
+    public void AddRaycynixIdentityDatabase_ShouldAllowDifferentContextTypes()
     {
         var services = CreateServices();
-        var configuration = BuildConfiguration("identity-repeat.db");
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["DatabaseOptions:EnsureCreated"] = "false",
+                ["DatabaseOptions:EnableSeed"] = "false",
+                ["DatabaseOptions:Contexts:DefaultIdentity:ConnectionString"] =
+                    "Data Source=identity-default-context.db",
+                ["DatabaseOptions:Contexts:CustomIdentity:ConnectionString"] =
+                    "Data Source=identity-custom-context.db"
+            })
+            .Build();
 
-        services.AddRaycynixIdentityDatabase(configuration, registerCallerAssembly: false);
+        services.AddRaycynixIdentityDatabase(
+                configuration, "DefaultIdentity", registerCallerAssembly: false)
+            .AddSqlite();
+        services.AddRaycynixIdentityDatabase<RaycynixIdentityDatabaseContext<TestIdentityUser>>(
+                configuration, "CustomIdentity", registerCallerAssembly: false)
+            .AddSqlite();
 
-        var act = () => services.AddRaycynixIdentityDatabase<RaycynixIdentityDatabaseContext<TestIdentityUser>>(
-            configuration,
-            registerCallerAssembly: false);
+        using var serviceProvider = services.BuildServiceProvider(validateScopes: true);
+        using var scope = serviceProvider.CreateScope();
+        var defaultContext = scope.ServiceProvider.GetRequiredService<RaycynixIdentityDatabaseContext>();
+        var customContext = scope.ServiceProvider
+            .GetRequiredService<RaycynixIdentityDatabaseContext<TestIdentityUser>>();
 
-        act.Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage("*already registered with context type*RaycynixIdentityDatabaseContext*");
+        defaultContext.Database.GetConnectionString().Should().Be("Data Source=identity-default-context.db");
+        customContext.Database.GetConnectionString().Should().Be("Data Source=identity-custom-context.db");
     }
 
     private static ServiceCollection CreateServices()

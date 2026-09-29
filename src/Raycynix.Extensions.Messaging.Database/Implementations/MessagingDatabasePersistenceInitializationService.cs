@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Hosting;
+using Raycynix.Extensions.Database;
 using Raycynix.Extensions.Database.Abstractions;
 
 namespace Raycynix.Extensions.Messaging.Database.Implementations;
@@ -7,12 +8,12 @@ namespace Raycynix.Extensions.Messaging.Database.Implementations;
 /// Initializes the messaging persistence schema during application startup.
 /// </summary>
 internal sealed class MessagingDatabasePersistenceInitializationService(
-    IDatabaseInitializer databaseInitializer) : IHostedService
+    IDatabaseInitializer<RaycynixDatabaseContext> databaseInitializer) : IHostedService
 {
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        return databaseInitializer.InitializeAsync(cancellationToken);
+        await databaseInitializer.InitializeAsync(cancellationToken);
     }
 
     /// <inheritdoc />

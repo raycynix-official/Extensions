@@ -1,5 +1,6 @@
 using System.Reflection;
 using Raycynix.Extensions.Database.Abstractions;
+using Raycynix.Extensions.Database.Implementations;
 
 namespace Raycynix.Extensions.Database.Infrastructure;
 
@@ -18,7 +19,8 @@ public static class DatabaseBuilderExtensions
         /// <returns>The same builder instance.</returns>
         public IDatabaseBuilder AddAssembly(Assembly assembly)
         {
-            builder.Services.AddRaycynixDatabaseAssembly(assembly);
+            ArgumentNullException.ThrowIfNull(assembly);
+            DatabaseModelAssemblyRegistry.GetOrCreate(builder.Services, builder.ContextType).Add(assembly);
             return builder;
         }
 

@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Raycynix.Extensions.Database.Abstractions;
 using Raycynix.Extensions.Database.Abstractions.Options;
-using Raycynix.Extensions.Database.Implementations;
 
 namespace Raycynix.Extensions.Database.AspNetCore.Identity;
 
@@ -19,17 +17,14 @@ public sealed class RaycynixIdentityDatabaseContext : IdentityDbContext, IRaycyn
     /// Initializes a new instance of the <see cref="RaycynixIdentityDatabaseContext"/>.
     /// </summary>
     /// <param name="options">The EF Core options for the context.</param>
-    /// <param name="config">The database configuration.</param>
-    /// <param name="modelConfigurator">The model configurator used to apply registered entity configurators.</param>
-    /// <param name="serviceProvider">The service provider used to resolve database infrastructure services.</param>
+    /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixIdentityDatabaseContext(
-        DbContextOptions options,
-        DatabaseOptions config,
-        IDatabaseModelConfigurator modelConfigurator,
-        IServiceProvider serviceProvider)
+        DbContextOptions<RaycynixIdentityDatabaseContext> options,
+        IDatabaseContextServices<RaycynixIdentityDatabaseContext> services)
         : base(options)
     {
-        _services = new RaycynixIdentityDatabaseContextServices(config, modelConfigurator, serviceProvider);
+        _services = new RaycynixIdentityDatabaseContextServices(
+            services.Options, services.ConfigureModel, services.GetModelCacheKey);
         _services.ConfigureChangeTracker(this);
     }
 
@@ -63,17 +58,14 @@ public sealed class RaycynixIdentityDatabaseContext<TUser> : IdentityDbContext<T
     /// Initializes a new instance of the <see cref="RaycynixIdentityDatabaseContext{TUser}"/>.
     /// </summary>
     /// <param name="options">The EF Core options for the context.</param>
-    /// <param name="config">The database configuration.</param>
-    /// <param name="modelConfigurator">The model configurator used to apply registered entity configurators.</param>
-    /// <param name="serviceProvider">The service provider used to resolve database infrastructure services.</param>
+    /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixIdentityDatabaseContext(
-        DbContextOptions options,
-        DatabaseOptions config,
-        IDatabaseModelConfigurator modelConfigurator,
-        IServiceProvider serviceProvider)
+        DbContextOptions<RaycynixIdentityDatabaseContext<TUser>> options,
+        IDatabaseContextServices<RaycynixIdentityDatabaseContext<TUser>> services)
         : base(options)
     {
-        _services = new RaycynixIdentityDatabaseContextServices(config, modelConfigurator, serviceProvider);
+        _services = new RaycynixIdentityDatabaseContextServices(
+            services.Options, services.ConfigureModel, services.GetModelCacheKey);
         _services.ConfigureChangeTracker(this);
     }
 
@@ -112,17 +104,14 @@ public sealed class RaycynixIdentityDatabaseContext<TUser, TRole, TKey>
     /// Initializes a new instance of the <see cref="RaycynixIdentityDatabaseContext{TUser, TRole, TKey}"/>.
     /// </summary>
     /// <param name="options">The EF Core options for the context.</param>
-    /// <param name="config">The database configuration.</param>
-    /// <param name="modelConfigurator">The model configurator used to apply registered entity configurators.</param>
-    /// <param name="serviceProvider">The service provider used to resolve database infrastructure services.</param>
+    /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixIdentityDatabaseContext(
-        DbContextOptions options,
-        DatabaseOptions config,
-        IDatabaseModelConfigurator modelConfigurator,
-        IServiceProvider serviceProvider)
+        DbContextOptions<RaycynixIdentityDatabaseContext<TUser, TRole, TKey>> options,
+        IDatabaseContextServices<RaycynixIdentityDatabaseContext<TUser, TRole, TKey>> services)
         : base(options)
     {
-        _services = new RaycynixIdentityDatabaseContextServices(config, modelConfigurator, serviceProvider);
+        _services = new RaycynixIdentityDatabaseContextServices(
+            services.Options, services.ConfigureModel, services.GetModelCacheKey);
         _services.ConfigureChangeTracker(this);
     }
 
@@ -155,7 +144,7 @@ public sealed class RaycynixIdentityDatabaseContext<TUser, TRole, TKey>
 /// <typeparam name="TRoleClaim">The role claim entity type.</typeparam>
 /// <typeparam name="TUserToken">The user token entity type.</typeparam>
 public sealed class RaycynixIdentityDatabaseContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim,
-        TUserToken>
+    TUserToken>
     : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>,
         IRaycynixIdentityDatabaseContext
     where TUser : IdentityUser<TKey>
@@ -173,17 +162,16 @@ public sealed class RaycynixIdentityDatabaseContext<TUser, TRole, TKey, TUserCla
     /// Initializes a new instance of the fully customized Raycynix Identity database context.
     /// </summary>
     /// <param name="options">The EF Core options for the context.</param>
-    /// <param name="config">The database configuration.</param>
-    /// <param name="modelConfigurator">The model configurator used to apply registered entity configurators.</param>
-    /// <param name="serviceProvider">The service provider used to resolve database infrastructure services.</param>
+    /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixIdentityDatabaseContext(
-        DbContextOptions options,
-        DatabaseOptions config,
-        IDatabaseModelConfigurator modelConfigurator,
-        IServiceProvider serviceProvider)
+        DbContextOptions<RaycynixIdentityDatabaseContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin,
+            TRoleClaim, TUserToken>> options,
+        IDatabaseContextServices<RaycynixIdentityDatabaseContext<TUser, TRole, TKey, TUserClaim, TUserRole,
+            TUserLogin, TRoleClaim, TUserToken>> services)
         : base(options)
     {
-        _services = new RaycynixIdentityDatabaseContextServices(config, modelConfigurator, serviceProvider);
+        _services = new RaycynixIdentityDatabaseContextServices(
+            services.Options, services.ConfigureModel, services.GetModelCacheKey);
         _services.ConfigureChangeTracker(this);
     }
 
@@ -204,38 +192,27 @@ public sealed class RaycynixIdentityDatabaseContext<TUser, TRole, TKey, TUserCla
     }
 }
 
-internal sealed class RaycynixIdentityDatabaseContextServices
+internal sealed class RaycynixIdentityDatabaseContextServices(
+    DatabaseOptions config,
+    Action<ModelBuilder> configureModel,
+    Func<string> getModelCacheKey)
 {
-    private readonly DatabaseOptions _config;
-    private readonly IDatabaseModelConfigurator _modelConfigurator;
-    private readonly string _providerName;
-
-    public RaycynixIdentityDatabaseContextServices(
-        DatabaseOptions config,
-        IDatabaseModelConfigurator modelConfigurator,
-        IServiceProvider serviceProvider)
-    {
-        _config = config;
-        _modelConfigurator = modelConfigurator;
-        _providerName = serviceProvider.GetRequiredService<DatabaseProviderDescriptor>().ProviderName;
-    }
-
     public void ConfigureChangeTracker(DbContext context)
     {
-        context.ChangeTracker.LazyLoadingEnabled = _config.EnableLazyLoading;
-        context.ChangeTracker.AutoDetectChangesEnabled = _config.EnableAutoDetectChanges;
-        context.ChangeTracker.QueryTrackingBehavior = _config.UseQueryTrackingByDefault
+        context.ChangeTracker.LazyLoadingEnabled = config.EnableLazyLoading;
+        context.ChangeTracker.AutoDetectChangesEnabled = config.EnableAutoDetectChanges;
+        context.ChangeTracker.QueryTrackingBehavior = config.UseQueryTrackingByDefault
             ? QueryTrackingBehavior.TrackAll
             : QueryTrackingBehavior.NoTracking;
     }
 
     public void ConfigureModel(ModelBuilder builder)
     {
-        _modelConfigurator.Configure(builder, _providerName);
+        configureModel(builder);
     }
 
     public string GetModelCacheKey()
     {
-        return _modelConfigurator.GetModelCacheKey(_providerName);
+        return getModelCacheKey();
     }
 }

@@ -2,7 +2,6 @@ using System.Reflection;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Raycynix.Extensions.Configuration.Abstractions.Interfaces;
 using Raycynix.Extensions.Database.Abstractions;
 using Raycynix.Extensions.Database.Abstractions.Options;
 using Raycynix.Extensions.Database.MsSql.Options;
@@ -13,8 +12,11 @@ namespace Raycynix.Extensions.Database.MsSql.Internal;
 /// Implements SQL Server-specific connection and EF Core configuration for the shared database context.
 /// </summary>
 internal sealed class MsSqlServerDatabaseProviderRegistration(
+    MsSqlServerOptions settings,
     ILogger<MsSqlServerDatabaseProviderRegistration>? logger = null) : IDatabaseProviderRegistration
 {
+    private readonly MsSqlServerOptions _settings = settings;
+
     /// <inheritdoc />
     public string ProviderName => "sqlserver";
 
@@ -23,33 +25,28 @@ internal sealed class MsSqlServerDatabaseProviderRegistration(
     {
         if (!string.IsNullOrWhiteSpace(configuration.ConnectionString))
         {
-            logger?.LogDebug("Using configured raw SQL Server connection string.");
+            logger?.LogDebug("Using configured raw SQL Server connection string");
             return configuration.ConnectionString;
         }
 
         var connection = configuration.ConnectionOptions
-                         ?? throw new ArgumentException("Connection configuration is missing.");
+                         ?? throw new ArgumentException("Connection configuration is missing");
 
-        var providerConfig = serviceProvider
-                .GetService(typeof(IConfigurationAccessor<MsSqlServerOptions>)) as
-            IConfigurationAccessor<MsSqlServerOptions>;
-
-        var settings = providerConfig?.Current;
         var builder = new SqlConnectionStringBuilder
         {
             DataSource = connection.Host,
             InitialCatalog = connection.Name,
             UserID = connection.Username,
             Password = connection.Password,
-            TrustServerCertificate = settings?.TrustServerCertificate ?? false,
-            MultipleActiveResultSets = settings?.MultipleActiveResultSets ?? false
+            TrustServerCertificate = _settings.TrustServerCertificate,
+            MultipleActiveResultSets = _settings.MultipleActiveResultSets
         };
 
         logger?.LogDebug(
-            "Resolved SQL Server connection string from structured configuration. TrustServerCertificate: {TrustServerCertificate}, MultipleActiveResultSets: {MultipleActiveResultSets}, CommandTimeoutConfigured: {CommandTimeoutConfigured}.",
+            "Resolved SQL Server connection string from structured configuration. TrustServerCertificate: {TrustServerCertificate}, MultipleActiveResultSets: {MultipleActiveResultSets}, CommandTimeoutConfigured: {CommandTimeoutConfigured}",
             builder.TrustServerCertificate,
             builder.MultipleActiveResultSets,
-            settings?.CommandTimeoutSeconds is not null);
+            _settings.CommandTimeoutSeconds is not null);
 
         return builder.ConnectionString;
     }
@@ -62,10 +59,6 @@ internal sealed class MsSqlServerDatabaseProviderRegistration(
         Assembly migrationsAssembly,
         IServiceProvider serviceProvider)
     {
-        var providerConfig = serviceProvider
-                .GetService(typeof(IConfigurationAccessor<MsSqlServerOptions>)) as
-            IConfigurationAccessor<MsSqlServerOptions>;
-
         options.UseSqlServer(connectionString, sqlOptions =>
         {
             sqlOptions.EnableRetryOnFailure(
@@ -74,16 +67,21 @@ internal sealed class MsSqlServerDatabaseProviderRegistration(
                 null);
 
             sqlOptions.MigrationsAssembly(migrationsAssembly.GetName().Name);
-
-            var settings = providerConfig?.Current;
-            if (settings?.CommandTimeoutSeconds is not null)
+            if (configuration.MigrationsHistoryTable is not null)
             {
-                sqlOptions.CommandTimeout(settings.CommandTimeoutSeconds.Value);
+                sqlOptions.MigrationsHistoryTable(
+                    configuration.MigrationsHistoryTable,
+                    configuration.MigrationsHistorySchema);
+            }
+
+            if (_settings.CommandTimeoutSeconds is not null)
+            {
+                sqlOptions.CommandTimeout(_settings.CommandTimeoutSeconds.Value);
             }
         });
 
         logger?.LogDebug(
-            "Configured EF Core SQL Server provider. Migrations assembly: {MigrationsAssembly}, RetryCount: {RetryCount}, RetryDelaySeconds: {RetryDelaySeconds}.",
+            "Configured EF Core SQL Server provider. Migrations assembly: {MigrationsAssembly}, RetryCount: {RetryCount}, RetryDelaySeconds: {RetryDelaySeconds}",
             migrationsAssembly.GetName().Name,
             configuration.RetryCount,
             configuration.RetryDelaySeconds);
@@ -94,23 +92,24 @@ internal sealed class MsSqlServerDatabaseProviderRegistration(
     {
         if (!string.IsNullOrWhiteSpace(configuration.ConnectionString))
         {
-            logger?.LogDebug("Skipping structured SQL Server validation because a raw connection string is configured.");
+            logger?.LogDebug(
+                "Skipping structured SQL Server validation because a raw connection string is configured");
             return;
         }
 
         var connection = configuration.ConnectionOptions
-                         ?? throw new InvalidOperationException("SQL Server connection configuration is missing.");
+                         ?? throw new InvalidOperationException("SQL Server connection configuration is missing");
 
         if (string.IsNullOrWhiteSpace(connection.Host))
         {
-            throw new InvalidOperationException("SQL Server connection requires a host.");
+            throw new InvalidOperationException("SQL Server connection requires a host");
         }
 
         if (string.IsNullOrWhiteSpace(connection.Name))
         {
-            throw new InvalidOperationException("SQL Server connection requires a database name.");
+            throw new InvalidOperationException("SQL Server connection requires a database name");
         }
 
-        logger?.LogDebug("SQL Server structured connection configuration validated.");
+        logger?.LogDebug("SQL Server structured connection configuration validated");
     }
 }

@@ -2,7 +2,6 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using Raycynix.Extensions.Configuration.Abstractions.Interfaces;
 using Raycynix.Extensions.Database.Abstractions;
 using Raycynix.Extensions.Database.Abstractions.Options;
 using MySqlOptions = Raycynix.Extensions.Database.MySql.Options.MySqlOptions;
@@ -13,8 +12,11 @@ namespace Raycynix.Extensions.Database.MySql.Internal;
 /// Implements MySQL-specific connection and EF Core configuration for the shared database context.
 /// </summary>
 internal sealed class MySqlDatabaseProviderRegistration(
+    MySqlOptions settings,
     ILogger<MySqlDatabaseProviderRegistration>? logger = null) : IDatabaseProviderRegistration
 {
+    private readonly MySqlOptions _settings = settings;
+
     /// <inheritdoc />
     public string ProviderName => "mysql";
 
@@ -23,17 +25,13 @@ internal sealed class MySqlDatabaseProviderRegistration(
     {
         if (!string.IsNullOrWhiteSpace(configuration.ConnectionString))
         {
-            logger?.LogDebug("Using configured raw MySQL connection string.");
+            logger?.LogDebug("Using configured raw MySQL connection string");
             return configuration.ConnectionString;
         }
 
         var connection = configuration.ConnectionOptions
-                         ?? throw new ArgumentException("Connection configuration is missing.");
-        
-        var providerConfig = serviceProvider
-            .GetService(typeof(IConfigurationAccessor<MySqlOptions>)) as IConfigurationAccessor<MySqlOptions>;
+                         ?? throw new ArgumentException("Connection configuration is missing");
 
-        var settings = providerConfig?.Current;
         var builder = new MySqlConnectionStringBuilder
         {
             Server = connection.Host,
@@ -41,15 +39,15 @@ internal sealed class MySqlDatabaseProviderRegistration(
             Database = connection.Name,
             UserID = connection.Username,
             Password = connection.Password,
-            AllowUserVariables = settings?.AllowUserVariables ?? true,
-            Pooling = settings?.Pooling ?? true
+            AllowUserVariables = _settings.AllowUserVariables,
+            Pooling = _settings.Pooling
         };
 
         logger?.LogDebug(
-            "Resolved MySQL connection string from structured configuration. Pooling: {Pooling}, AllowUserVariables: {AllowUserVariables}, CommandTimeoutConfigured: {CommandTimeoutConfigured}.",
+            "Resolved MySQL connection string from structured configuration. Pooling: {Pooling}, AllowUserVariables: {AllowUserVariables}, CommandTimeoutConfigured: {CommandTimeoutConfigured}",
             builder.Pooling,
             builder.AllowUserVariables,
-            settings?.CommandTimeoutSeconds is not null);
+            _settings.CommandTimeoutSeconds is not null);
 
         return builder.ConnectionString;
     }
@@ -62,9 +60,6 @@ internal sealed class MySqlDatabaseProviderRegistration(
         Assembly migrationsAssembly,
         IServiceProvider serviceProvider)
     {
-        var providerConfig = serviceProvider
-            .GetService(typeof(IConfigurationAccessor<MySqlOptions>)) as IConfigurationAccessor<MySqlOptions>;
-        
         options.UseMySQL(connectionString, mySqlOptions =>
         {
             mySqlOptions.EnableRetryOnFailure(
@@ -73,16 +68,19 @@ internal sealed class MySqlDatabaseProviderRegistration(
                 null);
 
             mySqlOptions.MigrationsAssembly(migrationsAssembly.GetName().Name);
+            if (configuration.MigrationsHistoryTable is not null)
+                mySqlOptions.MigrationsHistoryTable(
+                    configuration.MigrationsHistoryTable,
+                    configuration.MigrationsHistorySchema
+                );
 
-            var settings = providerConfig?.Current;
-            if (settings?.CommandTimeoutSeconds is not null)
-            {
-                mySqlOptions.CommandTimeout(settings.CommandTimeoutSeconds.Value);
-            }
+
+            if (_settings.CommandTimeoutSeconds is not null)
+                mySqlOptions.CommandTimeout(_settings.CommandTimeoutSeconds.Value);
         });
 
         logger?.LogDebug(
-            "Configured EF Core MySQL provider. Migrations assembly: {MigrationsAssembly}, RetryCount: {RetryCount}, RetryDelaySeconds: {RetryDelaySeconds}.",
+            "Configured EF Core MySQL provider. Migrations assembly: {MigrationsAssembly}, RetryCount: {RetryCount}, RetryDelaySeconds: {RetryDelaySeconds}",
             migrationsAssembly.GetName().Name,
             configuration.RetryCount,
             configuration.RetryDelaySeconds);
@@ -93,28 +91,22 @@ internal sealed class MySqlDatabaseProviderRegistration(
     {
         if (!string.IsNullOrWhiteSpace(configuration.ConnectionString))
         {
-            logger?.LogDebug("Skipping structured MySQL validation because a raw connection string is configured.");
+            logger?.LogDebug("Skipping structured MySQL validation because a raw connection string is configured");
             return;
         }
 
         var connection = configuration.ConnectionOptions
-                         ?? throw new InvalidOperationException("MySQL connection configuration is missing.");
+                         ?? throw new InvalidOperationException("MySQL connection configuration is missing");
 
         if (string.IsNullOrWhiteSpace(connection.Host))
-        {
-            throw new InvalidOperationException("MySQL connection requires a host.");
-        }
+            throw new InvalidOperationException("MySQL connection requires a host");
 
         if (string.IsNullOrWhiteSpace(connection.Name))
-        {
-            throw new InvalidOperationException("MySQL connection requires a database name.");
-        }
+            throw new InvalidOperationException("MySQL connection requires a database name");
 
         if (string.IsNullOrWhiteSpace(connection.Username))
-        {
-            throw new InvalidOperationException("MySQL connection requires a username.");
-        }
+            throw new InvalidOperationException("MySQL connection requires a username");
 
-        logger?.LogDebug("MySQL structured connection configuration validated.");
+        logger?.LogDebug("MySQL structured connection configuration validated");
     }
 }

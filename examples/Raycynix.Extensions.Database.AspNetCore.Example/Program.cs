@@ -15,13 +15,8 @@ builder.AddRaycynixSerilog(options =>
         "[{Timestamp:HH:mm:ss}] [{Level:u3}] [{ServiceName}] [{ServiceVersion}] [Env:{Environment}] {Message:lj}{NewLine}{Exception}");
 
 builder.Services
-    .AddRaycynixDatabase(builder.Configuration, options =>
-    {
-        options.EnsureCreated = true;
-        options.UseMigrations = false;
-        options.EnableSeed = true;
-    })
-    .AddSqlite(sqlite => { sqlite.CommandTimeoutSeconds = 30; });
+    .AddRaycynixDatabase(builder.Configuration, "Application")
+    .AddSqlite();
 
 var app = builder.Build();
 

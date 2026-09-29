@@ -29,6 +29,26 @@ public sealed class DatabaseInitializationTests
     }
 
     /// <summary>
+    /// Verifies that every registered database context initializer is invoked.
+    /// </summary>
+    [Fact]
+    public async Task InitializeRaycynixDatabaseAsync_WithMultipleInitializers_ShouldInvokeAll()
+    {
+        var firstInitializer = new FakeDatabaseInitializer();
+        var secondInitializer = new FakeDatabaseInitializer();
+        var services = new ServiceCollection();
+        services.AddScoped<IDatabaseInitializer>(_ => firstInitializer);
+        services.AddScoped<IDatabaseInitializer>(_ => secondInitializer);
+
+        await using var serviceProvider = services.BuildServiceProvider(validateScopes: true);
+
+        await serviceProvider.InitializeRaycynixDatabaseAsync(TestContext.Current.CancellationToken);
+
+        firstInitializer.CallCount.Should().Be(1);
+        secondInitializer.CallCount.Should().Be(1);
+    }
+
+    /// <summary>
     /// Verifies that host-based initialization delegates to the host service provider.
     /// </summary>
     [Fact]
@@ -36,10 +56,7 @@ public sealed class DatabaseInitializationTests
     {
         var initializer = new FakeDatabaseInitializer();
         using var host = new HostBuilder()
-            .ConfigureServices(services =>
-            {
-                services.AddScoped<IDatabaseInitializer>(_ => initializer);
-            })
+            .ConfigureServices(services => { services.AddScoped<IDatabaseInitializer>(_ => initializer); })
             .Build();
 
         await host.InitializeRaycynixDatabaseAsync(TestContext.Current.CancellationToken);

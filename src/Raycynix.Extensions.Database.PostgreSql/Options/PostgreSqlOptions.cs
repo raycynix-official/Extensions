@@ -53,7 +53,8 @@ public sealed class PostgreSqlOptions
 
         if (MaximumPoolSize <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(MaximumPoolSize), "Maximum pool size must be greater than zero.");
+            throw new ArgumentOutOfRangeException(nameof(MaximumPoolSize),
+                "Maximum pool size must be greater than zero.");
         }
 
         if (MinimumPoolSize is not null &&

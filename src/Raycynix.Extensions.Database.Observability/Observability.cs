@@ -17,7 +17,7 @@ public static class Observability
     public static IDatabaseBuilder AddObservability(this IDatabaseBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        
+
         builder.Services.Replace(ServiceDescriptor.Singleton<IDatabaseObservability, DatabaseObservability>());
         return builder;
     }
