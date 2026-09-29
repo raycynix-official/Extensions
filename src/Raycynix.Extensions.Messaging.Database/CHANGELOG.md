@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Messaging database startup initialization now cooperates with applications that register multiple database contexts.
+- Messaging database startup initializes only `RaycynixDatabaseContext`, leaving unrelated application and Identity contexts to their owners.
 
 ## 3.0.1
 
