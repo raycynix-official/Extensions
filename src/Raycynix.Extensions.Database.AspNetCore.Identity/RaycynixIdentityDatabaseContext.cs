@@ -19,7 +19,7 @@ public sealed class RaycynixIdentityDatabaseContext : IdentityDbContext, IRaycyn
     /// <param name="options">The EF Core options for the context.</param>
     /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixIdentityDatabaseContext(
-        DbContextOptions options,
+        DbContextOptions<RaycynixIdentityDatabaseContext> options,
         IDatabaseContextServices<RaycynixIdentityDatabaseContext> services)
         : base(options)
     {
@@ -60,7 +60,7 @@ public sealed class RaycynixIdentityDatabaseContext<TUser> : IdentityDbContext<T
     /// <param name="options">The EF Core options for the context.</param>
     /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixIdentityDatabaseContext(
-        DbContextOptions options,
+        DbContextOptions<RaycynixIdentityDatabaseContext<TUser>> options,
         IDatabaseContextServices<RaycynixIdentityDatabaseContext<TUser>> services)
         : base(options)
     {
@@ -106,7 +106,7 @@ public sealed class RaycynixIdentityDatabaseContext<TUser, TRole, TKey>
     /// <param name="options">The EF Core options for the context.</param>
     /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixIdentityDatabaseContext(
-        DbContextOptions options,
+        DbContextOptions<RaycynixIdentityDatabaseContext<TUser, TRole, TKey>> options,
         IDatabaseContextServices<RaycynixIdentityDatabaseContext<TUser, TRole, TKey>> services)
         : base(options)
     {
@@ -164,7 +164,8 @@ public sealed class RaycynixIdentityDatabaseContext<TUser, TRole, TKey, TUserCla
     /// <param name="options">The EF Core options for the context.</param>
     /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixIdentityDatabaseContext(
-        DbContextOptions options,
+        DbContextOptions<RaycynixIdentityDatabaseContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin,
+            TRoleClaim, TUserToken>> options,
         IDatabaseContextServices<RaycynixIdentityDatabaseContext<TUser, TRole, TKey, TUserClaim, TUserRole,
             TUserLogin, TRoleClaim, TUserToken>> services)
         : base(options)

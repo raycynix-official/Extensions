@@ -16,7 +16,7 @@ public sealed class RaycynixDatabaseContext : DbContext, IRaycynixDatabaseContex
     /// <param name="options">The EF Core options for the context.</param>
     /// <param name="services">The infrastructure isolated for this context.</param>
     public RaycynixDatabaseContext(
-        DbContextOptions options,
+        DbContextOptions<RaycynixDatabaseContext> options,
         IDatabaseContextServices<RaycynixDatabaseContext> services)
         : base(options)
     {
