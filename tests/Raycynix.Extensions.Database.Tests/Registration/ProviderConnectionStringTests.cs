@@ -210,11 +210,7 @@ public sealed class ProviderConnectionStringTests
             .AddSqlite();
 
         using var serviceProvider = services.BuildServiceProvider(validateScopes: true);
-        var registration = GetProviderRegistration(serviceProvider, "sqlite");
-
-        var act = () => registration.ResolveConnectionString(
-            CreateConnectionOptions(null, null, "orders.db", null, null),
-            serviceProvider);
+        var act = () => GetProviderRegistration(serviceProvider, "sqlite");
 
         act.Should().Throw<OptionsValidationException>()
             .WithMessage("*Mode contains unsupported value 'NotARealMode'*");
@@ -298,7 +294,8 @@ public sealed class ProviderConnectionStringTests
         act.Should().NotThrow();
     }
 
-    private static IDatabaseProviderRegistration GetProviderRegistration(IServiceProvider serviceProvider, string providerName)
+    private static IDatabaseProviderRegistration GetProviderRegistration(IServiceProvider serviceProvider,
+        string providerName)
     {
         return serviceProvider
             .GetRequiredService<IEnumerable<IDatabaseProviderRegistration>>()

@@ -150,10 +150,10 @@ public sealed class IdentityDatabaseRegistrationTests
     }
 
     /// <summary>
-    /// Verifies that a different context type cannot be registered after the initial database registration.
+    /// Verifies that different Identity context types can be registered independently.
     /// </summary>
     [Fact]
-    public void AddRaycynixIdentityDatabase_ShouldFail_WhenDifferentContextIsRegisteredAgain()
+    public void AddRaycynixIdentityDatabase_ShouldAllowDifferentContextTypes()
     {
         var services = CreateServices();
         var configuration = BuildConfiguration("identity-repeat.db");
@@ -164,9 +164,7 @@ public sealed class IdentityDatabaseRegistrationTests
             configuration,
             registerCallerAssembly: false);
 
-        act.Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage("*already registered with context type*RaycynixIdentityDatabaseContext*");
+        act.Should().NotThrow();
     }
 
     private static ServiceCollection CreateServices()
