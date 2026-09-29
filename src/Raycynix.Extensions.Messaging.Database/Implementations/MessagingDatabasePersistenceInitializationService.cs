@@ -7,12 +7,15 @@ namespace Raycynix.Extensions.Messaging.Database.Implementations;
 /// Initializes the messaging persistence schema during application startup.
 /// </summary>
 internal sealed class MessagingDatabasePersistenceInitializationService(
-    IDatabaseInitializer databaseInitializer) : IHostedService
+    IEnumerable<IDatabaseInitializer> databaseInitializers) : IHostedService
 {
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        return databaseInitializer.InitializeAsync(cancellationToken);
+        foreach (var databaseInitializer in databaseInitializers)
+        {
+            await databaseInitializer.InitializeAsync(cancellationToken);
+        }
     }
 
     /// <inheritdoc />
