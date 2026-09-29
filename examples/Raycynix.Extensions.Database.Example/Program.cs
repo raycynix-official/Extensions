@@ -14,16 +14,8 @@ builder
     .UseRaycynixSerilog()
     .ConfigureServices((context, services) =>
     {
-        services.AddRaycynixDatabase(context.Configuration, options =>
-            {
-                options.EnsureCreated = true;
-                options.UseMigrations = false;
-                options.EnableSeed = true;
-            })
-            .AddSqlite(sqlite =>
-            {
-                sqlite.CommandTimeoutSeconds = 30;
-            });
+        services.AddRaycynixDatabase(context.Configuration, "Application")
+            .AddSqlite();
 
         services.AddHostedService<DatabaseExampleWorker>();
     });
