@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0
+
+### Added
+
+- Added support for registering multiple independently configured Identity context types.
+- Added configuration-section overloads for Identity context registration.
+
 ## 3.0.1
 
 ### Added

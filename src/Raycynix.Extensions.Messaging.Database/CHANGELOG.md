@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.0
+
+### Changed
+
+- Messaging database startup initialization now cooperates with applications that register multiple database contexts.
+
 ## 3.0.1
 
 ### Added

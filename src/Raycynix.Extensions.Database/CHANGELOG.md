@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.1.0
+
+### Added
+
+- Added context-isolated registration for multiple EF Core contexts, including shared `DatabaseOptions`, named context overrides, per-context providers, provider options, model assemblies, and model configurators.
+- Added `IDatabaseContextServices<TContext>` support for custom contexts and typed `IDatabaseInitializer<TContext>` resolution.
+- Added per-context migrations history table and schema settings for all database providers.
+
+### Changed
+
+- Database startup initialization now initializes every registered context.
+- Kept the original unkeyed services available for existing single-context applications.
+
 ## 3.0.1
 
 ### Added

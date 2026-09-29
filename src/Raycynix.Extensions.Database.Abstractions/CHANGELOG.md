@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.0
+
+### Added
+
+- Added `IDatabaseContextServices<TContext>` for context-specific options and model configuration.
+- Added `IDatabaseInitializer<TContext>` for targeted initialization.
+- Exposed context, options, and configuration-section identity through `IDatabaseBuilder`.
+
 ## 3.0.1
 
 ### Added
