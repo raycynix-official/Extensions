@@ -10,6 +10,31 @@ namespace Raycynix.Extensions.Database.Abstractions;
 public interface IDatabaseBuilder
 {
     /// <summary>
+    /// Gets the context type owned by this registration.
+    /// </summary>
+    public Type ContextType { get; }
+
+    /// <summary>
+    /// Gets the named-options key used by this context.
+    /// </summary>
+    public string OptionsName { get; }
+
+    /// <summary>
+    /// Gets the configuration section bound to this context.
+    /// </summary>
+    public string ConfigurationSectionName { get; }
+
+    /// <summary>
+    /// Gets the logical context name used for context-specific configuration overrides.
+    /// </summary>
+    public string? ContextName { get; }
+
+    /// <summary>
+    /// Gets the context-specific configuration section, when a context name was supplied.
+    /// </summary>
+    public string? ContextConfigurationSectionName { get; }
+
+    /// <summary>
     /// Gets the underlying service collection.
     /// </summary>
     public IServiceCollection Services { get; }
