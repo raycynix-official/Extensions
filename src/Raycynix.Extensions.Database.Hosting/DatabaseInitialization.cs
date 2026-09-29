@@ -21,20 +21,28 @@ public static class DatabaseInitialization
     {
         using var scope = serviceProvider.CreateScope();
         var logger = scope.ServiceProvider.GetService<ILogger<IDatabaseInitializer>>();
-        var initializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
+        var initializers = scope.ServiceProvider.GetServices<IDatabaseInitializer>().ToArray();
+        if (initializers.Length == 0)
+        {
+            throw new InvalidOperationException("No Raycynix database context is registered.");
+        }
 
-        logger?.LogInformation("Starting Raycynix database initialization from service provider.");
+        logger?.LogInformation("Starting Raycynix database initialization from service provider");
 
         try
         {
-            await initializer.InitializeAsync(cancellationToken);
-            logger?.LogInformation("Raycynix database initialization from service provider completed.");
+            foreach (var initializer in initializers)
+            {
+                await initializer.InitializeAsync(cancellationToken);
+            }
+
+            logger?.LogInformation("Raycynix database initialization from service provider completed");
         }
         catch (Exception exception)
         {
             logger?.LogError(
                 exception,
-                "Raycynix database initialization from service provider failed.");
+                "Raycynix database initialization from service provider failed");
             throw;
         }
     }
@@ -49,7 +57,7 @@ public static class DatabaseInitialization
         CancellationToken cancellationToken = default)
     {
         var logger = host.Services.GetService<ILogger<IHost>>();
-        logger?.LogDebug("Starting Raycynix database initialization from host services.");
+        logger?.LogDebug("Starting Raycynix database initialization from host services");
 
         return host.Services.InitializeRaycynixDatabaseAsync(cancellationToken);
     }
